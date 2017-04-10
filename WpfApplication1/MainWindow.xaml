@@ -15,10 +15,12 @@
         </Grid.RowDefinitions>
         <Button Grid.Row="0" Name="New" Width="100" Content="New" Click="New_Click" Margin="35,0,657,0"/>
         <Button Grid.Row="0" Name="Send" Width="100" Content="Send" Click="Send_Click" Margin="149,0,543,0"/>
+        <Button Grid.Row="0" Name="Refresh" Width="100" Content="Refresh" Click="Refresh_OnClick" Margin="264,0,428,0"/>
+        <TextBox x:Name="TxtUrl" HorizontalAlignment="Left" Height="33" Margin="382,0,0,0" Text="" VerticalAlignment="Top" Width="400"/>
         <WindowsFormsHost Grid.Row="1">
-            <forms:WebBrowser x:Name="browser" ></forms:WebBrowser>
+            <forms:WebBrowser x:Name="Browser" ></forms:WebBrowser>
         </WindowsFormsHost>
-        <!--<WebBrowser Grid.Row="1" Name="browser"></WebBrowser>-->
+     
     </Grid>
 </Window>
 

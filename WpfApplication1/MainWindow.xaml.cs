@@ -31,8 +31,6 @@ namespace WpfApplication1
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string startUrl = @"F:\temp\Roman, Josh - Outlook Web App.htm";
-        private string newEmailUrl = @"Untitled Message.htm";
         private HtmlDocument document;
         private object obj = new object();
         private bool newEmailEventHandeled = false;
@@ -40,56 +38,46 @@ namespace WpfApplication1
         public MainWindow()
         {
             InitializeComponent();
-            browser.Navigate(startUrl);
-            browser.DocumentCompleted += BrowserOnDocumentCompleted;
-            
+            TxtUrl.Text = @"https://agencygateway1.allstate.com";
+            Browser.DocumentCompleted += BrowserOnDocumentCompleted;
+
+            var webBrowser = Browser.ActiveXInstance as SHDocVw.WebBrowser;
+            if (webBrowser != null)
+            {
+                webBrowser.NewWindow3 += MainWindow_NewWindow;
+                webBrowser.Silent = true;
+            }
+               
+            Browser.Navigate(TxtUrl.Text);
+
         }
         private void BrowserOnDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs webBrowserDocumentCompletedEventArgs)
         {
-            //var serviceProvider = (IServiceProvider)browser.Document;
-            //if (serviceProvider != null)
-            //{
-            //    Guid serviceGuid = new Guid("0002DF05-0000-0000-C000-000000000046");
-            //    Guid iid = typeof(SHDocVw.WebBrowser).GUID;
-            //    var webBrowserPtr = (SHDocVw.WebBrowser)serviceProvider
-            //        .QueryService(ref serviceGuid, ref iid);
-            //    if (webBrowserPtr != null)
-            //    {
-            //        webBrowserPtr.NewWindow3 += WebBrowserPtr_NewWindow3;
-            //        webBrowserPtr.NewWindow2 += WebBrowserPtr_NewWindow2; 
-            //    }
-            //}
+        //    HideScriptErrors(browser, true);
 
-            HideScriptErrors(browser, true);
-
-            ((SHDocVw.DWebBrowserEvents2_Event)browser.ActiveXInstance).NewWindow2 += MainWindow_NewWindow2; ;
-         
-            document = browser.Document;
+            document = Browser.Document;
         }
 
-        private void MainWindow_NewWindow2(ref object ppDisp, ref bool Cancel)
+        private void MainWindow_NewWindow(ref object ppDisp, ref bool Cancel, uint dwFlags, string bstrUrlContext, string bstrUrl)
         {
             Cancel = true;
-            if(browser.Url.ToString().Contains(startUrl))
-                browser.Navigate("https://webmail.allstate.com");
-            else if(browser.Url.ToString().Contains("35434534345565654646456"))
-                browser.Navigate("35434534345565654646456");
+            Browser.Navigate(bstrUrl);
         }
 
-        public void HideScriptErrors(WebBrowser wb, bool Hide)
-        {
-            FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fiComWebBrowser == null) return;
-            object objComWebBrowser = fiComWebBrowser.GetValue(wb);
-            objComWebBrowser?.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
-        }
+        //public void HideScriptErrors(WebBrowser wb, bool Hide)
+        //{
+        //    FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
+        //    if (fiComWebBrowser == null) return;
+        //    object objComWebBrowser = fiComWebBrowser.GetValue(wb);
+        //    objComWebBrowser?.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
+        //}
 
         private void New_Click(object sender, RoutedEventArgs e)
         {
             var element = document.GetElementById("newmsgc");
             if (element != null)
             {
-                browser.DocumentCompleted += NewEmail_Click;
+                Browser.DocumentCompleted += NewEmail_Click;
                 element.InvokeMember("click");
             }
 
@@ -103,7 +91,7 @@ namespace WpfApplication1
                 {
                     newEmailEventHandeled = true;
                     NewEmailHandler();
-                    browser.DocumentCompleted -= NewEmail_Click;
+                    Browser.DocumentCompleted -= NewEmail_Click;
                 }
             }
         }
@@ -211,6 +199,14 @@ needs.</font></span></p><font face=""Times New Roman"">
             var sendButton = document.GetElementById("send");
             sendButton?.Focus();
             sendButton?.InvokeMember("click");
+        }
+
+        private void Refresh_OnClick(object sender, RoutedEventArgs e)
+        {
+            if(TxtUrl.Text == Browser.Url.ToString())
+                Browser.Refresh();
+            else
+                Browser.Navigate(TxtUrl.Text);
         }
     }
 
