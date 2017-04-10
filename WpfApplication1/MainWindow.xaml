@@ -1,0 +1,24 @@
+﻿<Window x:Class="WpfApplication1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApplication1"
+        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        mc:Ignorable="d"
+        Title="DYL Email Integration Tool" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20*" />
+            <RowDefinition Height="293*"/>
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" Name="New" Width="100" Content="New" Click="New_Click" Margin="35,0,657,0"/>
+        <Button Grid.Row="0" Name="Send" Width="100" Content="Send" Click="Send_Click" Margin="149,0,543,0"/>
+        <WindowsFormsHost Grid.Row="1">
+            <forms:WebBrowser x:Name="browser" ></forms:WebBrowser>
+        </WindowsFormsHost>
+        <!--<WebBrowser Grid.Row="1" Name="browser"></WebBrowser>-->
+    </Grid>
+</Window>
+
