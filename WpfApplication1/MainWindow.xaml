@@ -13,10 +13,18 @@
             <RowDefinition Height="20*" />
             <RowDefinition Height="293*"/>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" Name="New" Width="100" Content="New" Click="New_Click" Margin="35,0,657,0"/>
-        <Button Grid.Row="0" Name="Send" Width="100" Content="Send" Click="Send_Click" Margin="149,0,543,0"/>
-        <Button Grid.Row="0" Name="Refresh" Width="100" Content="Refresh" Click="Refresh_OnClick" Margin="264,0,428,0"/>
-        <TextBox x:Name="TxtUrl" HorizontalAlignment="Left" Height="33" Margin="382,0,0,0" Text="" VerticalAlignment="Top" Width="400"/>
+        <Grid Grid.Row="0" Height="25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Name="New" Width="100" Content="New" Click="New_Click" />
+            <Button Grid.Column="1" Name="Send" Width="100" Content="Send" Click="Send_Click" />
+            <Button Grid.Column="2" Name="Refresh" Width="100" Content="Refresh" Click="Refresh_OnClick"/>
+            <TextBox Grid.Column="3"  x:Name="tbUrl" HorizontalAlignment="Left" Height="33" Text="{Binding  Path=Url, Mode=TwoWay}"   Width="500" />
+        </Grid>
         <WindowsFormsHost Grid.Row="1">
             <forms:WebBrowser x:Name="Browser" ></forms:WebBrowser>
         </WindowsFormsHost>
