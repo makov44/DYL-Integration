@@ -58,6 +58,7 @@ namespace WpfApplication1
             InitializeComponent();
             tbUrl.DataContext = this;
             Browser.DocumentCompleted += BrowserOnDocumentCompleted;
+           
 
             var webBrowser = Browser.ActiveXInstance as SHDocVw.WebBrowser;
             if (webBrowser != null)
@@ -77,6 +78,20 @@ namespace WpfApplication1
         {
             document = Browser.Document;
             Url = document?.Url?.ToString();
+            DisableAlertWindow();
+        }
+
+        private void DisableAlertWindow()
+        {
+            HtmlElement head = document?.GetElementsByTagName("head")[0];
+            HtmlElement scriptEl = document?.CreateElement("script");
+            IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
+
+            if (element!=null)
+                element.text = JavaScripts.AlertBlocker + " " + JavaScripts.OnbeforeunloadBlocker;
+
+            if(scriptEl !=null)
+                head?.AppendChild(scriptEl);
         }
 
         private void MainWindow_NewWindow(ref object ppDisp, ref bool Cancel, uint dwFlags, string bstrUrlContext, string bstrUrl)
@@ -98,7 +113,8 @@ namespace WpfApplication1
 
         private void NewEmail_Click(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-           NewEmailHandler();
+            DisableAlertWindow();
+            NewEmailHandler();
            Browser.DocumentCompleted -= NewEmail_Click;
         }
 
@@ -109,7 +125,6 @@ namespace WpfApplication1
 
             if (divTo == null)
             {
-                MessageBox.Show("divTo is NULL");
                 Log.Warn("DivTo is NULL");
             }
 
@@ -121,18 +136,18 @@ namespace WpfApplication1
 
             if (txtSubj == null)
             {
-                MessageBox.Show("txtSubj is NULL");
                 Log.Warn("txtSubj is NULL");
             }
 
             if (txtSubj != null)
             {
-                txtSubj?.Focus();
+                txtSubj.Focus();
+                Thread.Sleep(200);
+                SendKeys.SendWait("subject");
+                Thread.Sleep(200);
             }
 
-            Thread.Sleep(200);
-            SendKeys.SendWait("subject");
-            Thread.Sleep(200);
+            
 
             var win = document?.Window?.Frames?[0];
             if (win == null)
