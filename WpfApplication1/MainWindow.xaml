@@ -6,29 +6,35 @@
         xmlns:local="clr-namespace:WpfApplication1"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="DYL Email Integration Tool" Height="600" Width="800"
+        Title="DYL EMAIL" Height="600" Width="800"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20*" />
-            <RowDefinition Height="293*"/>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Height="25">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="100"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Name="New" Width="100" Content="New" Click="New_Click" />
-            <Button Grid.Column="1" Name="Send" Width="100" Content="Send" Click="Send_Click" />
-            <Button Grid.Column="2" Name="Refresh" Width="100" Content="Refresh" Click="Refresh_OnClick"/>
-            <TextBox Grid.Column="3"  x:Name="tbUrl" HorizontalAlignment="Left" Height="33" Text="{Binding  Path=Url, Mode=TwoWay}"   Width="500" />
+            <Button Grid.Column="0" Name="Back" Width="50" Content="&lt;-" Click="Back_OnClick" />
+            <Button Grid.Column="1" Name="Forward" Width="50" Content="-&gt;" Click="Forward_OnClick" />
+            <Button Grid.Column="3" Name="New" Width="100" Content="New" Click="New_Click" />
+            <Button Grid.Column="4" Name="Send" Width="100" Content="Send" Click="Send_Click" />
+            <Button Grid.Column="5" Name="Refresh" Width="100" Content="Refresh" Click="Refresh_OnClick"/>
+            <TextBox Grid.Column="6"  x:Name="tbAddress" HorizontalAlignment="Stretch" Height="25" KeyDown="TbUrl_OnKeyDown" />
         </Grid>
         <WindowsFormsHost Grid.Row="1">
             <forms:WebBrowser x:Name="Browser" ></forms:WebBrowser>
         </WindowsFormsHost>
-     
+        <TextBlock Grid.Row="2" Name="tblStatus" ></TextBlock>
     </Grid>
 </Window>
 

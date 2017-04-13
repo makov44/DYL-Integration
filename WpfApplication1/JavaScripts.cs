@@ -8,7 +8,9 @@ namespace WpfApplication1
 {
     static class JavaScripts
     {
-        public static string AlertBlocker = @"window.alert = function () { return true;  }; window.confirm=function () { return true; }; window.close=function () { };";
+        public static string AlertBlocker =
+                @"window.alert = function () { return true;  }; window.confirm=function () { return true; }; window.close=function () { };";
+
         public static string OnbeforeunloadBlocker = @"(function () {
             var onbeforeunloadHandler = function (ev) {
                 if (ev) {
@@ -35,5 +37,11 @@ namespace WpfApplication1
         window.setInterval(intervalHandler, 500);
         intervalHandler();
     })();";
+
+        public static string ReplaceIFrameContent = @"var replaceIFrameContent = function () {                                      
+                                       var docHtml = document.getElementById('ifBdy').contentDocument;
+                                         docHtml.write('Hello Hello'); 
+                                         window.alert('Hello');                                   
+                                        };";
     }
 }
