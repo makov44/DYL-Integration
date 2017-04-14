@@ -43,8 +43,8 @@ namespace WpfApplication1
         private HtmlDocument document;
         private bool newEmailEventHandeled = false;
         private string txtUrl;
-        private string startPage = @"https://agencygateway.allstate.com";
-        private string webEmailPage = @"https://webmail.allstate.com";
+        private string startPage = @"https://webmail.hostallapps.com/owa/";
+        private string webEmailPage = @"https://webmail.hostallapps.com/owa/";
 
         public MainWindow()
         {
@@ -78,21 +78,48 @@ namespace WpfApplication1
         {
             Log.Debug($"Called BrowserOnDocumentCompleted document Url = {Browser.Document?.Url}");
             document = Browser.Document;
+            if (document != null && document.Window != null)
+                document.Window.Error += Window_Error;
             DisableAlertWindow();
             NewEmailHandler();
         }
 
+        private void Window_Error(object sender, HtmlElementErrorEventArgs e)
+        {
+            var url = "";
+            try
+            {
+                url = e.Url.ToString();
+            }
+            catch
+            {
+                url = document?.Url?.ToString();
+            }
+            
+            e.Handled = true;
+            Log.Error($"Document error happened. Error:{e.Description}, lineNumber:{e.LineNumber}, url:{url}");
+        }
+
         private void DisableAlertWindow()
         {
+            var scriptId = "PopupWindowsBlocker";
+            var script = document?.GetElementById(scriptId);
+
+            if (script != null)
+                return;
+
             HtmlElement head = document?.GetElementsByTagName("head")[0];
             HtmlElement scriptEl = document?.CreateElement("script");
             IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
+            if (scriptEl == null)
+                return;
+
+            scriptEl.Id = scriptId;
 
             if (element!=null)
                 element.text = JavaScripts.AlertBlocker + " " + JavaScripts.OnbeforeunloadBlocker;
 
-            if(scriptEl !=null)
-                head?.AppendChild(scriptEl);
+            head?.AppendChild(scriptEl);
         }
 
         private void MainWindow_NewWindow(ref object ppDisp, ref bool Cancel, uint dwFlags, string bstrUrlContext, string bstrUrl)
@@ -113,9 +140,9 @@ namespace WpfApplication1
 
         private void NewEmailHandler()
         {
+            var frame = document.GetElementById("ifBdy");
             var txtSubj = document.GetElementById("txtSubj");
             var divTo = document.GetElementById("divTo");
-            var frame = document.GetElementById("ifBdy");
 
             if (txtSubj == null || divTo == null || frame == null)
             {
@@ -124,36 +151,33 @@ namespace WpfApplication1
                 return;
             }
 
-            txtSubj.SetAttribute("value", "subject");
-       
-            divTo.InnerText = "makov.sergey@gmail.com";
+            if (txtSubj.GetAttribute("value") != "subject")
+                txtSubj.SetAttribute("value", "subject");
 
-         //   frame.SetAttribute("src", "about:blank");
+            if (divTo.InnerText != "makov.sergey@gmail.com")
+                divTo.InnerText = "makov.sergey@gmail.com";
 
-            //HtmlElement head = document?.GetElementsByTagName("head")[0];
-            //HtmlElement scriptEl = document?.CreateElement("script");
-            //IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
+            var scriptId = "replaceIFrameContentIId";
+            var script = document.GetElementById(scriptId);
+            if (script != null)
+            {
+                document.InvokeScript("replaceIFrameContent");
+                return;
+            }
 
-            //if (element != null)
-            //    element.text = JavaScripts.ReplaceIFrameContent;
+            var head = document?.GetElementsByTagName("head")[0];
+            var scriptEl = document?.CreateElement("script");
+            var element = (IHTMLScriptElement)scriptEl?.DomElement;
 
-            //if (scriptEl != null)
-            //    head?.AppendChild(scriptEl);
+            if (scriptEl == null || element == null)
+                return;
 
-            //document.InvokeScript("replaceIFrameContent");
+            element.text = JavaScripts.ReplaceIFrameContent;
+            scriptEl.Id = scriptId;
+            head?.AppendChild(scriptEl);
 
-            //var frames = document?.Window?.Frames;
-            //var win = frames != null && frames.Count > 0 ? frames[0] : null;
-            //if (win == null || win.Document == null || win.Document.Body == null)
-            //{
-            //    Log.Warn(@"'document?.Window?.Frames?[0]' is NULL or
-            //               'document?.Window?.Frames?[0].Document' is NULL or
-            //                'document?.Window?.Frames?[0].Document.Body' is NULL ");
-            //    return;
-            //}
+            document.InvokeScript("replaceIFrameContent");
 
-
-            // win.Document.Body.InnerHtml = frameInnerHtml;
         }
 
         private void Send_Click(object sender, RoutedEventArgs e)
