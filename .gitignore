@@ -241,3 +241,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /WpfApplication1_axBrowser.7z
+/Script1.js

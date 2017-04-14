@@ -1,35 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using mshtml;
-using System.Threading;
-using System.Windows.Forms;
-using WindowsInput;
-using WindowsInput.Native;
-using Clipboard = System.Windows.Clipboard;
-using MessageBox = System.Windows.MessageBox;
-using TextDataFormat = System.Windows.TextDataFormat;
-using WebBrowser = System.Windows.Forms.WebBrowser;
 using System.ComponentModel;
+using System.Threading;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Input;
 using log4net;
-using ButtonBase = System.Windows.Controls.Primitives.ButtonBase;
+using mshtml;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
-namespace WpfApplication1
+namespace DYL.EmailIntegration
 {       
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -61,7 +40,6 @@ namespace WpfApplication1
             }
 
             Browser.Navigate(startPage);
-
         }
 
         private void Browser_Navigated(object sender, WebBrowserNavigatedEventArgs e)

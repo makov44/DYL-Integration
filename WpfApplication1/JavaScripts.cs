@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WpfApplication1
+﻿namespace DYL.EmailIntegration
 {
     static class JavaScripts
     {
@@ -30,7 +24,7 @@ namespace WpfApplication1
             handler = window.attachEvent(""onbeforeunload"", onbeforeunloadHandler);          
         };
 
-        window.setInterval(intervalHandler, 100);
+        window.setInterval(intervalHandler, 200);
         intervalHandler();
     })();";
 
