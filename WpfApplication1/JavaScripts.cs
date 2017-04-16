@@ -3,7 +3,9 @@
     static class JavaScripts
     {
         public static string AlertBlocker =
-                @" window.confirm=function () { return true; }; window.close=function () { };";
+                @"window.alert=function() { return true;};
+                  window.confirm=function () { return true; }; 
+                  window.close=function () { };";
 
         public static string OnbeforeunloadBlocker = @"(function () {
             var onbeforeunloadHandler = function (ev) {
@@ -30,8 +32,7 @@
 
         public static string ReplaceIFrameContent = @"
 var replaceIFrameContent = function () {
-    var handler = function () {
-        try {           
+    var handler = function () {                 
             var iframe = document.getElementById('ifBdy');
             if (iframe)
                 iframe.onload = function () {
@@ -50,11 +51,7 @@ var replaceIFrameContent = function () {
             doc.write('<html><body>Hello Hello</body></html>');
             doc.close();
             
-            clearInterval(interval);
-        }
-        catch (e) {
-            window.alert(e);
-        }
+            clearInterval(interval);       
     }
     var interval = setInterval(handler, 200);
 };";
