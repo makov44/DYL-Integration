@@ -6,67 +6,103 @@
         xmlns:local="clr-namespace:DYL.EmailIntegration.Views"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="DYL EMAIL" Height="600" Width="800"
-        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="Emails DYL" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" MinHeight="600" MinWidth="800" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid x:Name="MainLayout" Visibility="{Binding MainLayoutVisibility}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25" />
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="25" />
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Height="25">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Name="Back" Width="46" Content="&lt;-" Command="{Binding BackCommand}" />
-                <Button Grid.Column="1" Name="Forward" Width="46" Content="-&gt;" Command="{Binding ForwardCommand}" />
-                <Button Grid.Column="3" Name="New" Width="96" Content="New" Command="{Binding NewCommand}" />
-                <Button Grid.Column="4" Name="Send" Width="96" Content="Send" Command="{Binding SendCommand}"/>
-                <Button Grid.Column="5" Name="Refresh" Width="96" Content="Refresh" Command="{Binding RefreshCommand}"/>
-                <TextBox Grid.Column="6"  x:Name="Address" HorizontalAlignment="Stretch" Height="25" Text="{Binding Address, Mode=TwoWay}">
-                    <TextBox.InputBindings>
-                        <KeyBinding 
-                            Key="Enter" 
-                            Command="{Binding EnterCommand}" 
-                            CommandParameter="{Binding Path=Text, RelativeSource={RelativeSource AncestorType={x:Type TextBox}}}" />
-                    </TextBox.InputBindings>
-                </TextBox>
-                <Button Grid.Column="7" Name="LogOut" Width="96" Content="Log Out" Command="{Binding LogOutCommand}"/>
-            </Grid>
-            <WindowsFormsHost Grid.Row="1">
-                <forms:WebBrowser x:Name="Browser"></forms:WebBrowser>
-            </WindowsFormsHost>
-            <TextBlock Grid.Row="2"  Text="{Binding Status}"  ></TextBlock>
-        </Grid>
-        <Grid  Name ="LogInLayout" HorizontalAlignment="Center" VerticalAlignment="Center"
-               Background="LightBlue" Visibility="{Binding LogInLayoutVisibility}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid  Grid.Column="0" Margin="5,0,5,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Emails DYL" FontSize="32" FontWeight="Bold" Foreground="#FF0A0B0E" Margin="0,10,0,20"></TextBlock>
+                    <TextBlock Grid.Row="1" Text="Total Emails: 50" ></TextBlock>
+                    <TextBlock Grid.Row="2" Text="Remaining Emails: 40" ></TextBlock>
+                    <TextBlock Grid.Row="3" Text="Sent Emails: 10" ></TextBlock>
+                    <TextBlock  Grid.Row="4" Text="Please review and edit emails before sending." Margin="0,10,0,0" TextWrapping="Wrap"></TextBlock>
+                    <CheckBox Grid.Row="5" Content="Bypass email review."  Margin="0,40,0,10" ></CheckBox>
+                    <Button Grid.Row="6" Content="Start sending emails"  HorizontalAlignment="Left"   Margin="0,5,0,5" Width="160" ></Button>
+                    <Button Grid.Row="7" Content="Delete current email" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                    <Button Grid.Row="8" Content="Delete all emails" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Name="Back" Width="46" Content="&lt;-" Command="{Binding BackCommand}" />
+                    <Button Grid.Column="1" Name="Forward" Width="46" Content="-&gt;" Command="{Binding ForwardCommand}" />
+                    <Button Grid.Column="3" Name="New" Width="96" Content="New" Command="{Binding NewCommand}" />
+                    <Button Grid.Column="4" Name="Send" Width="96" Content="Send" Command="{Binding SendCommand}"/>
+                    <Button Grid.Column="5" Name="Refresh" Width="96" Content="Refresh" Command="{Binding RefreshCommand}"/>
+                    <TextBox Grid.Column="6"  x:Name="Address" HorizontalAlignment="Stretch" Text="{Binding Address, Mode=TwoWay}">
+                        <TextBox.InputBindings>
+                            <KeyBinding 
+                                Key="Enter" 
+                                Command="{Binding EnterCommand}" 
+                                CommandParameter="{Binding Path=Text, RelativeSource={RelativeSource AncestorType={x:Type TextBox}}}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="7" Name="LogOut" Width="96" Content="Log Out" Command="{Binding LogOutCommand}"/>
+                </Grid>
+                <Border Grid.Row="1" BorderThickness="1" BorderBrush="DarkGray" Margin="0, 15, 0, 0">
+                    <WindowsFormsHost>
+                        <forms:WebBrowser x:Name="Browser"/>
+                    </WindowsFormsHost>
+                </Border>
+                <Grid Grid.Row="2" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock  Text="{Binding Status}"  ></TextBlock>
+                </Grid>
+                </Grid>
+        </Grid>
+        <Grid  Name ="LogInLayout" HorizontalAlignment="Center" VerticalAlignment="Center"  
+               Background="LightBlue" Visibility="{Binding LogInLayoutVisibility}"  Width="282" Height="173" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="43*"/>
+                <ColumnDefinition Width="69*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition Height="1.5*"/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Log in" Grid.ColumnSpan="2" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="20"/>
-            <TextBlock Text="Name" Grid.Row="1" Margin="3"/>
-            <TextBox x:Name="txtName" Grid.Row="1" Grid.Column="1" Margin="3" MinWidth="100" HorizontalAlignment="Left"/>
-            <TextBlock Text="Password" Grid.Row="2" Margin="3"/>
-            <TextBox x:Name="txtPassword"  Grid.Column="1" Grid.Row="2" Margin="3" MinWidth="100" HorizontalAlignment="Left"/>
-            <Button Command="{Binding LogInCommand}" Content="Log in" Grid.Row="3" Grid.Column="1" Margin="3"/>
+            <TextBlock Text="Emails DYL Login:" Grid.ColumnSpan="2" FontWeight="Bold" HorizontalAlignment="Center" Margin="61,11,55,35" FontSize="20" Width="166" Grid.RowSpan="2"/>
+            <TextBlock Text="Name"  Grid.Row="1" Margin="6,3,3,3"/>
+            <TextBox x:Name="txtName"  Grid.Row="1" Grid.Column="1" Margin="3,3,0,3" MinWidth="100" HorizontalAlignment="Left" Width="166"/>
+            <TextBlock Text="Password"  Grid.Row="2" Margin="6,3,3,3"/>
+            <TextBox x:Name="txtPassword" Grid.Column="1" Grid.Row="2" Margin="3,3,0,3"  MinWidth="100" HorizontalAlignment="Left" Width="166"/>
+            <Button Command="{Binding LogInCommand}" Content="Log in" Grid.Row="3" Grid.Column="1" Margin="3,3,5,3"/>
         </Grid>
     </Grid>
 </Window>
