@@ -5,18 +5,25 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
+using DYL.EmailIntegration.Domain;
+using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Helpers;
+using DYL.EmailIntegration.Models;
+using DYL.EmailIntegration.Properties;
 using log4net;
 using mshtml;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using WebBrowser = System.Windows.Forms.WebBrowser;
 
 namespace DYL.EmailIntegration.ViewModels
 {
     public class MainViewModel: ViewModelBase
     {
-        public ICommand LogInCommand => new DelegateCommand(param=> { LogIn_OnClick(); });
+        public ICommand LogInCommand => new DelegateCommand(LogIn_OnClick);
         public ICommand LogOutCommand => new DelegateCommand(param => { LogOut_OnClick(); });
         public ICommand BackCommand => new DelegateCommand(param => { Back_OnClick();});
         public ICommand ForwardCommand => new DelegateCommand(param => { Forward_OnClick();});
@@ -26,10 +33,43 @@ namespace DYL.EmailIntegration.ViewModels
         public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); });
 
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private WebBrowser _browser;
-        private HtmlDocument document;
-        private string startPage = @"https://webmail.hostallapps.com/owa/";
-        private string webEmailPage = @"https://webmail.hostallapps.com/owa/";
+        private readonly WebBrowser _browser;
+        private HtmlDocument _document;
+        private readonly string _startPage =Settings.Default.AllStatesGatewayUrl;
+        private readonly string _webEmailPage = Settings.Default.AllStatesOutlookUrl;
+
+        private string _totalEmails;
+        public string TotalEmails
+        {
+            get { return _totalEmails; }
+            set
+            {
+                _totalEmails = "Total emails: " + value;
+                RaisePropertyChangedEvent("TotalEmails");
+            }
+        }
+
+        private string _remainingEmails;
+        public string RemainingEmails
+        {
+            get { return _remainingEmails; }
+            set
+            {
+                _remainingEmails ="Remaining emails: " + value;
+                RaisePropertyChangedEvent("RemainingEmails");
+            }
+        }
+
+        private string _sentEmails;
+        public string SentEmails
+        {
+            get { return _sentEmails; }
+            set
+            {
+                _sentEmails ="Sent emails: "+ value;
+                RaisePropertyChangedEvent("SentEmails");
+            }
+        }
 
         private string _address;
         public string Address
@@ -50,6 +90,40 @@ namespace DYL.EmailIntegration.ViewModels
             {
                 _status = value;
                 RaisePropertyChangedEvent("Status");
+            }
+        }
+
+        private string _userName;
+        public string UserName
+        {
+            get { return _userName; }
+            set
+            {
+                _userName = value;
+                RaisePropertyChangedEvent("UserName");
+            }
+        }
+
+        private string _sessionKey;
+        public string SessionKey
+        {
+            get { return _sessionKey; }
+            set
+            {
+                _sessionKey = value;
+                Context.SessionKey = value;
+                RaisePropertyChangedEvent("SessionKey");
+            }
+        }
+
+        private Visibility _isLoginInvalid;
+        public Visibility IsLoginInvalid
+        {
+            get { return _isLoginInvalid; }
+            set
+            {
+                _isLoginInvalid = value;
+                RaisePropertyChangedEvent("IsLoginInvalid");
             }
         }
 
@@ -87,9 +161,28 @@ namespace DYL.EmailIntegration.ViewModels
                 webBrowser.NewWindow3 += MainWindow_NewWindow;
                 webBrowser.Silent = true;
             }
-            _browser.Navigate(startPage);
+            _browser.Navigate(_startPage);
             MainLayoutVisibility = Visibility.Collapsed;
             LogInLayoutVisibility = Visibility.Visible;
+            IsLoginInvalid = Visibility.Collapsed;
+            this.PropertyChanged += MainViewModel_PropertyChanged;
+        }
+
+        private void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != "SessionKey")
+                return;
+
+            if (!string.IsNullOrEmpty(_sessionKey))
+            {
+                LogInLayoutVisibility = Visibility.Collapsed;
+                MainLayoutVisibility = Visibility.Visible;
+            }
+            else
+            {
+                LogInLayoutVisibility = Visibility.Visible;
+                MainLayoutVisibility = Visibility.Collapsed;
+            }
         }
 
         #region Browser events
@@ -106,9 +199,9 @@ namespace DYL.EmailIntegration.ViewModels
         private void BrowserOnDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs webBrowserDocumentCompletedEventArgs)
         {
             Log.Debug($"Called BrowserOnDocumentCompleted document Url = {_browser.Document?.Url}");
-            document = _browser.Document;
-            if (document != null && document.Window != null)
-                document.Window.Error += Window_Error;
+            _document = _browser.Document;
+            if (_document != null && _document.Window != null)
+                _document.Window.Error += Window_Error;
             DisableAlertWindow();
             NewEmailHandler();
         }
@@ -131,7 +224,7 @@ namespace DYL.EmailIntegration.ViewModels
             }
             catch
             {
-                url = document?.Url?.ToString();
+                url = _document?.Url?.ToString();
             }
 
             e.Handled = true;
@@ -142,11 +235,11 @@ namespace DYL.EmailIntegration.ViewModels
         {
             try
             {
-                var sendButton = document.GetElementById("send");
+                var sendButton = _document.GetElementById("send");
                 sendButton?.Focus();
                 sendButton?.InvokeMember("click");
                 Thread.Sleep(500);
-                _browser.Navigate(webEmailPage);
+                _browser.Navigate(_webEmailPage);
             }
             catch (Exception ex)
             {
@@ -184,22 +277,34 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void New_OnClick()
         {
-            var element = document.GetElementById("newmsgc");
+            var element = _document.GetElementById("newmsgc");
             if (element != null)
             {
                 element.InvokeMember("click");
             }
         }
-        private void LogIn_OnClick()
+        private void LogIn_OnClick(object parameter)
         {
-            LogInLayoutVisibility = Visibility.Collapsed;
-            MainLayoutVisibility = Visibility.Visible;
+           
+            var passwordBox = parameter as PasswordBox;
+            var password = passwordBox?.Password;
+            var login = new Login
+            {
+                UserName = UserName,
+                Password = password
+            };
+        
+            System.Windows.Application.Current.Dispatcher.Invoke( async () => 
+            {
+                SessionKey = await HttpService.GetSessionKey("api/outlook", login);
+            });
         }
 
         private void LogOut_OnClick()
         {
             LogInLayoutVisibility = Visibility.Visible;
             MainLayoutVisibility = Visibility.Collapsed;
+            SessionKey = string.Empty;
         }
 
         #endregion
@@ -207,13 +312,13 @@ namespace DYL.EmailIntegration.ViewModels
         private void DisableAlertWindow()
         {
             var scriptId = "PopupWindowsBlocker";
-            var script = document?.GetElementById(scriptId);
+            var script = _document?.GetElementById(scriptId);
 
             if (script != null)
                 return;
 
-            HtmlElement head = document?.GetElementsByTagName("head")[0];
-            HtmlElement scriptEl = document?.CreateElement("script");
+            HtmlElement head = _document?.GetElementsByTagName("head")[0];
+            HtmlElement scriptEl = _document?.CreateElement("script");
             IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
             if (scriptEl == null)
                 return;
@@ -228,14 +333,14 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void NewEmailHandler()
         {
-            var frame = document.GetElementById("ifBdy");
-            var txtSubj = document.GetElementById("txtSubj");
-            var divTo = document.GetElementById("divTo");
+            var frame = _document.GetElementById("ifBdy");
+            var txtSubj = _document.GetElementById("txtSubj");
+            var divTo = _document.GetElementById("divTo");
 
             if (txtSubj == null || divTo == null || frame == null)
             {
                 Log.Debug($"It is not a New email page. txtSubj={txtSubj}," +
-                          $" divTo={divTo}, frame={frame}, page url={document.Url}");
+                          $" divTo={divTo}, frame={frame}, page url={_document.Url}");
                 return;
             }
 
@@ -246,15 +351,15 @@ namespace DYL.EmailIntegration.ViewModels
                 divTo.InnerText = "makov.sergey@gmail.com";
 
             var scriptId = "replaceIFrameContentIId";
-            var script = document.GetElementById(scriptId);
+            var script = _document.GetElementById(scriptId);
             if (script != null)
             {
-                document.InvokeScript("replaceIFrameContent");
+                _document.InvokeScript("replaceIFrameContent");
                 return;
             }
 
-            var head = document?.GetElementsByTagName("head")[0];
-            var scriptEl = document?.CreateElement("script");
+            var head = _document?.GetElementsByTagName("head")[0];
+            var scriptEl = _document?.CreateElement("script");
             var element = (IHTMLScriptElement)scriptEl?.DomElement;
 
             if (scriptEl == null || element == null)
@@ -264,9 +369,7 @@ namespace DYL.EmailIntegration.ViewModels
             scriptEl.Id = scriptId;
             head?.AppendChild(scriptEl);
 
-            document.InvokeScript("replaceIFrameContent");
-
+            _document.InvokeScript("replaceIFrameContent");
         }
-       
     }
 }

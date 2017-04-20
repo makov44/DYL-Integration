@@ -22,5 +22,41 @@ namespace DYL.EmailIntegration.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
+        public int ServiceInterval {
+            get {
+                return ((int)(this["ServiceInterval"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://dyl1-cy.getdyl.com")]
+        public string BaseUrl {
+            get {
+                return ((string)(this["BaseUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://webmail.hostallapps.com/owa/")]
+        public string AllStatesGatewayUrl {
+            get {
+                return ((string)(this["AllStatesGatewayUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://webmail.hostallapps.com/owa/")]
+        public string AllStatesOutlookUrl {
+            get {
+                return ((string)(this["AllStatesOutlookUrl"]));
+            }
+        }
     }
 }
