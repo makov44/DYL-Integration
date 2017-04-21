@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ServiceInterval" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">60000</Value>
+      <Value Profile="(Default)">20000</Value>
     </Setting>
     <Setting Name="BaseUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://dyl1-cy.getdyl.com</Value>

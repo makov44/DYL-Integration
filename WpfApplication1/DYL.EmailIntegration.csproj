@@ -112,6 +112,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\DelegateCommand.cs" />
+    <Compile Include="Helpers\ObservableConcurrentQueue.cs" />
+    <Compile Include="Helpers\PageName.cs" />
     <Compile Include="JavaScripts.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

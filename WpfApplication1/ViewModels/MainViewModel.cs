@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,50 +24,43 @@ namespace DYL.EmailIntegration.ViewModels
 {
     public class MainViewModel: ViewModelBase
     {
+        #region commands
         public ICommand LogInCommand => new DelegateCommand(LogIn_OnClick);
         public ICommand LogOutCommand => new DelegateCommand(param => { LogOut_OnClick(); });
         public ICommand BackCommand => new DelegateCommand(param => { Back_OnClick();});
         public ICommand ForwardCommand => new DelegateCommand(param => { Forward_OnClick();});
-        public ICommand NewCommand => new DelegateCommand(param=> { New_OnClick(); });
+        public ICommand SendEmailsCommand => new DelegateCommand(param=> { New_OnClick(); });
         public ICommand SendCommand => new DelegateCommand(param => { Send_OnClick(); });
         public ICommand RefreshCommand => new DelegateCommand(param => { Refresh_OnClick(); });
         public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); });
+        #endregion
 
+        #region properties
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly WebBrowser _browser;
         private HtmlDocument _document;
         private readonly string _startPage =Settings.Default.AllStatesGatewayUrl;
         private readonly string _webEmailPage = Settings.Default.AllStatesOutlookUrl;
+        private PageName _currentPage;
 
-        private string _totalEmails;
-        public string TotalEmails
-        {
-            get { return _totalEmails; }
-            set
-            {
-                _totalEmails = "Total emails: " + value;
-                RaisePropertyChangedEvent("TotalEmails");
-            }
-        }
-
-        private string _remainingEmails;
-        public string RemainingEmails
+        private int _remainingEmails;
+        public int RemainingEmails
         {
             get { return _remainingEmails; }
             set
             {
-                _remainingEmails ="Remaining emails: " + value;
+                _remainingEmails = value;
                 RaisePropertyChangedEvent("RemainingEmails");
             }
         }
 
-        private string _sentEmails;
-        public string SentEmails
+        private int _sentEmails;
+        public int SentEmails
         {
             get { return _sentEmails; }
             set
             {
-                _sentEmails ="Sent emails: "+ value;
+                _sentEmails = value;
                 RaisePropertyChangedEvent("SentEmails");
             }
         }
@@ -149,6 +143,8 @@ namespace DYL.EmailIntegration.ViewModels
             }
         }
 
+        #endregion
+
         public MainViewModel(WebBrowser browser)
         {
             _browser = browser;
@@ -166,6 +162,17 @@ namespace DYL.EmailIntegration.ViewModels
             LogInLayoutVisibility = Visibility.Visible;
             IsLoginInvalid = Visibility.Collapsed;
             this.PropertyChanged += MainViewModel_PropertyChanged;
+            Context.EmailQueue.CollectionChanged += EmailQueue_CollectionChanged; ;
+            _currentPage = PageName.None;
+            SentEmails = 0;
+        }
+
+        private void EmailQueue_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == NotifyCollectionChangedAction.Add)
+                RemainingEmails ++;
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+                RemainingEmails--;
         }
 
         private void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -185,7 +192,7 @@ namespace DYL.EmailIntegration.ViewModels
             }
         }
 
-        #region Browser events
+        #region Browser events handlers
         private void Browser_Navigated(object sender, WebBrowserNavigatedEventArgs e)
         {
             Address = _browser.Url.ToString();
@@ -203,7 +210,12 @@ namespace DYL.EmailIntegration.ViewModels
             if (_document != null && _document.Window != null)
                 _document.Window.Error += Window_Error;
             DisableAlertWindow();
-            NewEmailHandler();
+            if(_currentPage == PageName.New)
+                NewEmailHandler();
+            else if(_currentPage == PageName.Home)
+                HomeEmailHandler();
+
+            _currentPage = PageName.None;
         }
 
         private void MainWindow_NewWindow(ref object ppDisp, ref bool Cancel, uint dwFlags, string bstrUrlContext,
@@ -236,10 +248,16 @@ namespace DYL.EmailIntegration.ViewModels
             try
             {
                 var sendButton = _document.GetElementById("send");
-                sendButton?.Focus();
-                sendButton?.InvokeMember("click");
-                Thread.Sleep(500);
+                if (sendButton == null)
+                {
+                    Log.Error("Can't find element by id 'send' on the page.");
+                    return;
+                }
+                sendButton.Focus();
+                sendButton.InvokeMember("click");
+                _currentPage = PageName.Home;
                 _browser.Navigate(_webEmailPage);
+                SentEmails++;
             }
             catch (Exception ex)
             {
@@ -280,12 +298,16 @@ namespace DYL.EmailIntegration.ViewModels
             var element = _document.GetElementById("newmsgc");
             if (element != null)
             {
+                _currentPage = PageName.New;
                 element.InvokeMember("click");
+            }
+            else
+            {
+                Log.Error("Can't find element 'newmsgc' on the page.");
             }
         }
         private void LogIn_OnClick(object parameter)
         {
-           
             var passwordBox = parameter as PasswordBox;
             var password = passwordBox?.Password;
             var login = new Login
@@ -333,6 +355,14 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void NewEmailHandler()
         {
+            Email email;
+            Context.EmailQueue.TryDequeue(out email);
+            if (email == null)
+            {
+               Log.Error("Can't retrieve email from the queue.");
+                return;
+            }
+
             var frame = _document.GetElementById("ifBdy");
             var txtSubj = _document.GetElementById("txtSubj");
             var divTo = _document.GetElementById("divTo");
@@ -344,11 +374,11 @@ namespace DYL.EmailIntegration.ViewModels
                 return;
             }
 
-            if (txtSubj.GetAttribute("value") != "subject")
-                txtSubj.SetAttribute("value", "subject");
+            if (txtSubj.GetAttribute("value") != email.Subject)
+                txtSubj.SetAttribute("value", email.Subject);
 
-            if (divTo.InnerText != "makov.sergey@gmail.com")
-                divTo.InnerText = "makov.sergey@gmail.com";
+            if (divTo.InnerText != email.To)
+                divTo.InnerText = email.To;
 
             var scriptId = "replaceIFrameContentIId";
             var script = _document.GetElementById(scriptId);
@@ -365,11 +395,26 @@ namespace DYL.EmailIntegration.ViewModels
             if (scriptEl == null || element == null)
                 return;
 
-            element.text = JavaScripts.ReplaceIFrameContent;
+            element.text = JavaScripts.ReplaceIFrameContent.Replace("=eewwfdfadsdffgnvbnbvhkiussdavcvbgfhyt=", email.Body);
             scriptEl.Id = scriptId;
             head?.AppendChild(scriptEl);
 
             _document.InvokeScript("replaceIFrameContent");
+        }
+
+        private void HomeEmailHandler()
+        {
+            if (Context.EmailQueue.Count > 0)
+            {
+                Task.Run(()=>
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Task.Delay(1000);
+                        New_OnClick();
+                    });
+                });
+            }
         }
     }
 }

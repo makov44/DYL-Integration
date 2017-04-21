@@ -48,7 +48,7 @@ var replaceIFrameContent = function () {
                 return;
 
             doc.open();
-            doc.write('<html><body>Hello Hello</body></html>');
+            doc.write('=eewwfdfadsdffgnvbnbvhkiussdavcvbgfhyt=');
             doc.close();
             
             clearInterval(interval);       

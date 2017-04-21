@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Data;
+using DYL.EmailIntegration.Helpers;
 using DYL.EmailIntegration.Models;
 using DYL.EmailIntegration.Properties;
 using log4net;
@@ -17,7 +18,7 @@ namespace DYL.EmailIntegration
     public partial class App : Application
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+       
         public App()
         {
             AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -35,19 +36,19 @@ namespace DYL.EmailIntegration
         {
             log4net.Config.XmlConfigurator.Configure();
             Log.Info("Application Started");
-            Context.EmailQueue = new ConcurrentQueue<Email>();
+            Context.EmailQueue = new ObservableConcurrentBag<Email>();
             HttpService.CreateService(Settings.Default.BaseUrl);
             LocalTimer.Interval = Settings.Default.ServiceInterval;
             LocalTimer.Start(TimerEventHandler);
             base.OnStartup(e);
         }
+
         protected override void OnExit(ExitEventArgs e)
         {
             if (!Context.EmailQueue.IsEmpty)
             {
                 Log.Info("Email queue is not empty.");
                 MessageBox.Show("Email queue is not empty. Please review remaning emails.");
-                return;
             }
             LocalTimer.Stop();
             Log.Info("Application Exited");
@@ -76,10 +77,20 @@ namespace DYL.EmailIntegration
            
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
-                var response = await HttpService.GetEmails("api/outlook_emails", session);
-                if (response == null || response.Count == 0  || response.Data == null)
-                    return;
-                response.Data.ForEach(x=> Context.EmailQueue.Enqueue(x));
+                try
+                {
+                    var response = await HttpService.GetEmails("api/outlook_emails", session);
+                    if (response == null || response.Count == 0 || response.Data == null)
+                        return;
+                    response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
+
+                    if (Context.EmailQueue.Count > 1000)
+                        Log.Error("Email Queue has more then 1000 items.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             });
         }
     }
