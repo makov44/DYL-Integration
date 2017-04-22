@@ -12,9 +12,22 @@ namespace DYL.EmailIntegration.Models
 {
     internal static class Context
     {
-        internal static string SessionKey { get; set; }
+        internal static Session Session { get; set; }
       
         internal static ObservableConcurrentBag<Email> EmailQueue { get; set; }
-      
+
+        internal static event EventHandler LoginClick;
+
+        internal static event EventHandler OnLoginCompleted;
+
+        internal static void RaiseLogInClickEvent(Login login)
+        {
+            LoginClick?.Invoke(new object(), new EventSessionArgs(login));
+        }
+
+        internal static void RaiseOnLoginCompletedEvent(LoginResult loginResult)
+        {
+            OnLoginCompleted?.Invoke(new object(), new EventLoginResultArg(loginResult));
+        }
     }
 }

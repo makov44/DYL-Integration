@@ -111,9 +111,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DelegateCommand.cs" />
+    <Compile Include="Helpers\EventLoginResultArg.cs" />
+    <Compile Include="Helpers\EventSessionArgs.cs" />
+    <Compile Include="Helpers\LoginResult.cs" />
     <Compile Include="Helpers\ObservableConcurrentQueue.cs" />
     <Compile Include="Helpers\PageName.cs" />
+    <Compile Include="Helpers\Session.cs" />
     <Compile Include="JavaScripts.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

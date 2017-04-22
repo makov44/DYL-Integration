@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,10 +38,47 @@ namespace DYL.EmailIntegration
             log4net.Config.XmlConfigurator.Configure();
             Log.Info("Application Started");
             Context.EmailQueue = new ObservableConcurrentBag<Email>();
+            Context.LoginClick += MainWindowLoginClick;
             HttpService.CreateService(Settings.Default.BaseUrl);
             LocalTimer.Interval = Settings.Default.ServiceInterval;
             LocalTimer.Start(TimerEventHandler);
             base.OnStartup(e);
+        }
+
+        private void MainWindowLoginClick(object sender, EventArgs e)
+        {
+            var eventSessionArgs = e as EventSessionArgs;
+
+            if (eventSessionArgs == null)
+                return;
+
+             GetNewSessionKey(eventSessionArgs.Login, key =>
+             {
+                 Context.RaiseOnLoginCompletedEvent(string.IsNullOrEmpty(key)
+                     ? LoginResult.Failed
+                     : LoginResult.Success);
+
+                 Context.Session = !string.IsNullOrEmpty(key) ? new Session(key, DateTime.Now) : null;
+
+                 if (string.IsNullOrEmpty(key))
+                     return;
+                 var data = eventSessionArgs.Login.UserName + "|" + eventSessionArgs.Login.Password;
+                 var dataEnrpt = EncryptionService.Encrypt(data);
+                 if (dataEnrpt.Length == 0)
+                     return;
+                 IsolatedStorageService.Write(Constants.LoginFileName, dataEnrpt);
+             });
+
+           
+        }
+
+        private void GetNewSessionKey(Login login, Action<string> callback)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(async () =>
+            {
+                var key = await HttpService.GetSessionKey("api/outlook", login);
+                callback(key);
+            });
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -58,9 +96,9 @@ namespace DYL.EmailIntegration
         private void TimerEventHandler()
         {
             Log.Info("Timer elapsed event raised.");
-            if (string.IsNullOrEmpty(Context.SessionKey))
+            if (Context.Session == null)
             {
-                Log.Info("SessionKey is null or empty.");
+                Log.Info("Session is null");
                 return;
             }
 
@@ -70,15 +108,56 @@ namespace DYL.EmailIntegration
                 return;
             }
 
-            var session = new Session
+            if (Context.Session.TimeStamp.AddHours(48) < DateTime.Now)
             {
-                session_key = Context.SessionKey
-            };
-           
+                var dataEnrpt = IsolatedStorageService.Read(Constants.LoginFileName);
+                var data = EncryptionService.Decrypt(dataEnrpt);
+                if (string.IsNullOrEmpty(data))
+                {
+                    Log.Error("Decrypted data is not valid");
+                    return;
+                }
+                    
+                var array = data.Split('|');
+
+                if (array.Length != 2)
+                {
+                    Log.Error("Decrypted data is not valid");
+                    return;
+                }
+
+                var login = new Login
+                {
+                    UserName = array[0],
+                    Password = array[1]
+                };
+                
+                GetNewSessionKey(login, key =>
+                {
+                    Context.Session = !string.IsNullOrEmpty(key) 
+                    ? new Session(key, DateTime.Now) 
+                    : null;
+
+                    if (Context.Session != null)
+                        GetEmails(Context.Session.Key); 
+                });
+            }
+            else
+            {
+                GetEmails(Context.Session.Key);
+            }
+        }
+
+        private  void GetEmails(string key)
+        {
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
                 try
                 {
+                    var session = new SessionKey
+                    {
+                        session_key = key
+                    };
                     var response = await HttpService.GetEmails("api/outlook_emails", session);
                     if (response == null || response.Count == 0 || response.Data == null)
                         return;

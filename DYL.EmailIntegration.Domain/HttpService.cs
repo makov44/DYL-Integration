@@ -33,7 +33,7 @@ namespace DYL.EmailIntegration.Domain
                     if (!response.IsSuccessStatusCode)
                         return String.Empty;
 
-                    var result = await response.Content.ReadAsAsync<Session>();
+                    var result = await response.Content.ReadAsAsync<SessionKey>();
                     response.Content.Dispose();
 
                     return result?.session_key;
@@ -46,7 +46,7 @@ namespace DYL.EmailIntegration.Domain
             }
         }
 
-        public static async Task<EmailsHttpResponse> GetEmails(string requestUrl, Session sessionkey)
+        public static async Task<EmailsHttpResponse> GetEmails(string requestUrl, SessionKey sessionkey)
         {
             try
             {

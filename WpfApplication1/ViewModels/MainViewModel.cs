@@ -98,18 +98,6 @@ namespace DYL.EmailIntegration.ViewModels
             }
         }
 
-        private string _sessionKey;
-        public string SessionKey
-        {
-            get { return _sessionKey; }
-            set
-            {
-                _sessionKey = value;
-                Context.SessionKey = value;
-                RaisePropertyChangedEvent("SessionKey");
-            }
-        }
-
         private Visibility _isLoginInvalid;
         public Visibility IsLoginInvalid
         {
@@ -161,10 +149,27 @@ namespace DYL.EmailIntegration.ViewModels
             MainLayoutVisibility = Visibility.Collapsed;
             LogInLayoutVisibility = Visibility.Visible;
             IsLoginInvalid = Visibility.Collapsed;
-            this.PropertyChanged += MainViewModel_PropertyChanged;
-            Context.EmailQueue.CollectionChanged += EmailQueue_CollectionChanged; ;
+            Context.EmailQueue.CollectionChanged += EmailQueue_CollectionChanged;
+            Context.OnLoginCompleted += Context_OnLoginCompleted;
             _currentPage = PageName.None;
             SentEmails = 0;
+        }
+
+        private void Context_OnLoginCompleted(object sender, EventArgs e)
+        {
+            var el = e as EventLoginResultArg;
+
+            if (el?.LoginResult == LoginResult.Success)
+            {
+                LogInLayoutVisibility = Visibility.Collapsed;
+                MainLayoutVisibility = Visibility.Visible;
+                IsLoginInvalid = Visibility.Collapsed;
+            }
+            else if (el?.LoginResult == LoginResult.Failed)
+            {
+                IsLoginInvalid = Visibility.Visible;
+                Log.Error("Failed to login.");
+            }
         }
 
         private void EmailQueue_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -173,23 +178,6 @@ namespace DYL.EmailIntegration.ViewModels
                 RemainingEmails ++;
             else if (e.Action == NotifyCollectionChangedAction.Remove)
                 RemainingEmails--;
-        }
-
-        private void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName != "SessionKey")
-                return;
-
-            if (!string.IsNullOrEmpty(_sessionKey))
-            {
-                LogInLayoutVisibility = Visibility.Collapsed;
-                MainLayoutVisibility = Visibility.Visible;
-            }
-            else
-            {
-                LogInLayoutVisibility = Visibility.Visible;
-                MainLayoutVisibility = Visibility.Collapsed;
-            }
         }
 
         #region Browser events handlers
@@ -315,18 +303,13 @@ namespace DYL.EmailIntegration.ViewModels
                 UserName = UserName,
                 Password = password
             };
-        
-            System.Windows.Application.Current.Dispatcher.Invoke( async () => 
-            {
-                SessionKey = await HttpService.GetSessionKey("api/outlook", login);
-            });
+          
+            Context.RaiseLogInClickEvent(login);
         }
-
         private void LogOut_OnClick()
         {
             LogInLayoutVisibility = Visibility.Visible;
             MainLayoutVisibility = Visibility.Collapsed;
-            SessionKey = string.Empty;
         }
 
         #endregion
