@@ -146,29 +146,30 @@ namespace DYL.EmailIntegration.ViewModels
                 webBrowser.Silent = true;
             }
             _browser.Navigate(_startPage);
-            MainLayoutVisibility = Visibility.Collapsed;
-            LogInLayoutVisibility = Visibility.Visible;
-            IsLoginInvalid = Visibility.Collapsed;
             Context.EmailQueue.CollectionChanged += EmailQueue_CollectionChanged;
-            Context.OnLoginCompleted += Context_OnLoginCompleted;
+            Context.PropertyChanged += Context_PropertyChanged;
             _currentPage = PageName.None;
             SentEmails = 0;
+            LogInLayoutVisibility = Visibility.Visible;
+            MainLayoutVisibility = Visibility.Collapsed;
+            IsLoginInvalid = Visibility.Collapsed;
         }
 
-        private void Context_OnLoginCompleted(object sender, EventArgs e)
+        private void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var el = e as EventLoginResultArg;
+            if (e.PropertyName != "Session")
+                return;
 
-            if (el?.LoginResult == LoginResult.Success)
+            if (Context.Session == null)
+            {
+                LogInLayoutVisibility = Visibility.Visible;
+                MainLayoutVisibility = Visibility.Collapsed;
+            }
+            else
             {
                 LogInLayoutVisibility = Visibility.Collapsed;
                 MainLayoutVisibility = Visibility.Visible;
-                IsLoginInvalid = Visibility.Collapsed;
-            }
-            else if (el?.LoginResult == LoginResult.Failed)
-            {
-                IsLoginInvalid = Visibility.Visible;
-                Log.Error("Failed to login.");
+                ApplicationService.GetEmails(Context.Session.Key);
             }
         }
 
@@ -298,13 +299,25 @@ namespace DYL.EmailIntegration.ViewModels
         {
             var passwordBox = parameter as PasswordBox;
             var password = passwordBox?.Password;
-            var login = new Login
+            var credentials = new Credentials
             {
                 UserName = UserName,
                 Password = password
             };
-          
-            Context.RaiseLogInClickEvent(login);
+
+            ApplicationService.GetNewSessionKey(credentials, key =>
+            {
+                if (string.IsNullOrEmpty(key))
+                {
+                    IsLoginInvalid = Visibility.Visible;
+                    Log.Error("Failed to login.");
+                }
+
+                Context.Session = !string.IsNullOrEmpty(key) ? new Session(key, DateTime.Now) : null;
+
+                if (!string.IsNullOrEmpty(key))
+                    Authentication.SaveCredentials(credentials);
+            });
         }
         private void LogOut_OnClick()
         {

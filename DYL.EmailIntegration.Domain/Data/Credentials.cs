@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DYL.EmailIntegration.Domain.Data
 {
-    public class Login
+    public class Credentials
     {
         public string UserName { get; set; }
 

@@ -9,35 +9,37 @@ using log4net.Config;
 
 namespace DYL.EmailIntegration.Domain
 {
-    public static  class LocalTimer
+    public class LocalTimer
     {
-        private static readonly System.Timers.Timer Timer;
-        public static int Interval { get; set; }
+        private readonly System.Timers.Timer _timer;
+
+        private readonly string _name;
+
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        static LocalTimer()
+        public  LocalTimer(int interval, string name)
         {
-            Timer = new Timer();
+            _name = name;
+            _timer = new Timer(interval);
         }
 
-        public static void Start(Action action)
+        public void Start(Action action)
         {
-            if(Interval<=0)
+            if(_timer.Interval <= 0)
                 return;
-            Timer.Interval = Interval;
-            Timer.Elapsed += async (obj, e) => await Task.Factory.StartNew(action);
-            Timer.AutoReset = true;
-            Timer.Enabled = true;
-            Timer.Start();
-            Log.Info("Email service started.");
+            _timer.Elapsed += async (obj, e) => await Task.Factory.StartNew(action);
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
+            _timer.Start();
+            Log.Info($"{_name} timer started.");
         }
 
-        public static void Stop()
+        public void Stop()
         {
-            Timer.Enabled = false;
-            Timer.Stop();
-            Timer.Dispose();
-            Log.Info("Email service stoped.");
+            _timer.Enabled = false;
+            _timer.Stop();
+            _timer.Dispose();
+            Log.Info($"{_name} timer stoped.");
         }
        
     }

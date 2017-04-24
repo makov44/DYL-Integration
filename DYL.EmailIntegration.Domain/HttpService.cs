@@ -24,11 +24,11 @@ namespace DYL.EmailIntegration.Domain
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public static async Task<string> GetSessionKey(string requestUrl, Login login)
+        public static async Task<string> GetSessionKey(string requestUrl, Credentials credentials)
         {
             try
             {
-                using (var response = await Client.PostAsJsonAsync(requestUrl, login))
+                using (var response = await Client.PostAsJsonAsync(requestUrl, credentials))
                 {
                     if (!response.IsSuccessStatusCode)
                         return String.Empty;

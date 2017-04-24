@@ -25,7 +25,7 @@ namespace DYL.EmailIntegration.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
         public int ServiceInterval {
             get {
                 return ((int)(this["ServiceInterval"]));

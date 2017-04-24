@@ -10,11 +10,11 @@ namespace DYL.EmailIntegration.Helpers
 {
     public class EventSessionArgs : EventArgs
     {
-        public Login Login { get; set; }
+        public Credentials Credentials { get; set; }
 
-        public EventSessionArgs(Login login)
+        public EventSessionArgs(Credentials credentials)
         {
-            Login = login;
+            Credentials = credentials;
         }
     }
 }

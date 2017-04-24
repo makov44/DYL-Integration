@@ -111,6 +111,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\ApplicationService.cs" />
+    <Compile Include="Helpers\Authentication.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DelegateCommand.cs" />
     <Compile Include="Helpers\EventLoginResultArg.cs" />

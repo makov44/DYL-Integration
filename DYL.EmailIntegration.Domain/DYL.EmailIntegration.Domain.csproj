@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="Data\Email.cs" />
     <Compile Include="Data\EmailsHttpResponse.cs" />
-    <Compile Include="Data\Login.cs" />
+    <Compile Include="Data\Credentials.cs" />
     <Compile Include="EncryptionService.cs" />
     <Compile Include="HttpService.cs" />
     <Compile Include="IsolatedStorageService.cs" />
