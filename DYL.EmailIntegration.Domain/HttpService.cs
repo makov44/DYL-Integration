@@ -31,7 +31,11 @@ namespace DYL.EmailIntegration.Domain
                 using (var response = await Client.PostAsJsonAsync(requestUrl, credentials))
                 {
                     if (!response.IsSuccessStatusCode)
+                    {
+                        Log.Error($"Failed to login, statusCode:{response.StatusCode}, reason:{response.ReasonPhrase}");
                         return String.Empty;
+                    }
+                       
 
                     var result = await response.Content.ReadAsAsync<SessionKey>();
                     response.Content.Dispose();

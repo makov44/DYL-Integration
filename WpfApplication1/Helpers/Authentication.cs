@@ -42,8 +42,8 @@ namespace DYL.EmailIntegration.Helpers
 
                 var credentials = new Credentials
                 {
-                    UserName = array[0],
-                    Password = array[1]
+                    email = array[0],
+                    password = array[1]
                 };
                 return credentials;
             }
@@ -58,7 +58,7 @@ namespace DYL.EmailIntegration.Helpers
         {
             try
             {
-                var data = credentials.UserName + "|" + credentials.Password;
+                var data = credentials.email + "|" + credentials.password;
                 var dataEnrpt = EncryptionService.Encrypt(data);
                 if (dataEnrpt.Length == 0)
                     return;

@@ -23,7 +23,7 @@ namespace DYL.EmailIntegration.Helpers
                     {
                         session_key = key
                     };
-                    var response = await HttpService.GetEmails("api/outlook_emails", session);
+                    var response = await HttpService.GetEmails("api/outlook/emails", session);
                     if (response == null || response.Count == 0 || response.Data == null)
                         return;
                     response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
@@ -42,7 +42,7 @@ namespace DYL.EmailIntegration.Helpers
         {
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
-                var key = await HttpService.GetSessionKey("api/outlook", credentials);
+                var key = await HttpService.GetSessionKey("api/outlook/login", credentials);
                 callback(key);
             });
         }

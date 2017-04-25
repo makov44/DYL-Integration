@@ -11,5 +11,7 @@ namespace DYL.EmailIntegration.Domain.Data
         public List<Email> Data { get; set; }
 
         public int Limit { get; set; }
+
+        public int message { get; set; }
     }
 }

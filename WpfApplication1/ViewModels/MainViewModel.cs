@@ -358,8 +358,8 @@ namespace DYL.EmailIntegration.ViewModels
             var password = passwordBox?.Password;
             var credentials = new Credentials
             {
-                UserName = UserName,
-                Password = password
+                email = UserName,
+                password = password
             };
 
             ApplicationService.GetNewSessionKey(credentials, key =>
