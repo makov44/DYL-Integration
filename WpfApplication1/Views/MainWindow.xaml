@@ -40,10 +40,16 @@
                     <TextBlock  Text="{Binding SentEmails}" ></TextBlock>
                 </StackPanel>
                 <TextBlock  Grid.Row="4" Text="Please review and edit emails before sending." Margin="0,20,0,0" TextWrapping="Wrap"></TextBlock>
-                <CheckBox Grid.Row="5" Content="Bypass email review."  Margin="0,50,0,10" ></CheckBox>
-                <Button Grid.Row="6" Content="Start sending emails"  Command="{Binding SendEmailsCommand}" HorizontalAlignment="Left"   Margin="0,5,0,5" Width="160" ></Button>
-                <Button Grid.Row="7" Content="Delete current email" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
-                <Button Grid.Row="8" Content="Delete all emails" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                <CheckBox Grid.Row="5" Content="Bypass email review."  Margin="0,50,0,10" />
+                <StackPanel  Grid.Row="6" Visibility="{Binding EmailsListLayout}">
+                    <Button  Content="Send emails"  Command="{Binding SendEmailsCommand}" HorizontalAlignment="Left"   Margin="0,5,0,5" Width="160" ></Button>
+                    <Button  Content="Delete all emails" Command="{Binding DeleteAllCommand}" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                </StackPanel>
+                <StackPanel  Grid.Row="6" Visibility="{Binding EmailLayout}">
+                    <Button  Content="Send"  Command="{Binding SendCommand}" HorizontalAlignment="Left"    Margin="0,5,0,5" Width="160" ></Button>
+                    <Button  Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                </StackPanel>
+
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
@@ -57,15 +63,13 @@
                         <ColumnDefinition Width="50"/>
                         <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Name="Back" Width="46" Content="&lt;-" Command="{Binding BackCommand}" />
                     <Button Grid.Column="1" Name="Forward" Width="46" Content="-&gt;" Command="{Binding ForwardCommand}" />
-                    <Button Grid.Column="3" Name="Send" Width="96" Content="Send" Command="{Binding SendCommand}"/>
-                    <Button Grid.Column="4" Name="Refresh" Width="96" Content="Refresh" Command="{Binding RefreshCommand}"/>
-                    <TextBox Grid.Column="5"  x:Name="Address" HorizontalAlignment="Stretch" Text="{Binding Address, Mode=TwoWay}">
+                    <Button Grid.Column="3" Name="Refresh" Width="96" Content="Refresh" Command="{Binding RefreshCommand}"/>
+                    <TextBox Grid.Column="4"  x:Name="Address" HorizontalAlignment="Stretch" Text="{Binding Address, Mode=TwoWay}">
                         <TextBox.InputBindings>
                             <KeyBinding 
                                 Key="Enter" 

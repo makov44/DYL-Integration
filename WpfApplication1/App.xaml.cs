@@ -34,7 +34,9 @@ namespace DYL.EmailIntegration
         {
             Exception ex = (Exception)args.ExceptionObject;
             Log.Fatal("Unhandeled exception happened in application.", ex);
-            MessageBox.Show("Unhandeled exception happened in application. See log file for details.");
+            MessageBox.Show("Unhandeled exception happened in application. See log file for details.", 
+                "ERROR", MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -57,7 +59,9 @@ namespace DYL.EmailIntegration
             if (!Context.EmailQueue.IsEmpty)
             {
                 Log.Info("Email queue is not empty.");
-                MessageBox.Show("Email queue is not empty. Please review remaning emails.");
+                MessageBox.Show("Email queue is not empty. Please review remaning emails.",
+                    "WARNING", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             _emailsTimer.Stop();
             _sessionTimer.Stop();

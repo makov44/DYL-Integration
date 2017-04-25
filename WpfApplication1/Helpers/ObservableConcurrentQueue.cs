@@ -41,5 +41,18 @@ namespace DYL.EmailIntegration.Helpers
         {
             CollectionChanged?.Invoke(this, e);
         }
+
+        public void Clear()
+        {
+            lock (this)
+            {
+                var count = this.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    T item;
+                    this.TryDequeue(out item);
+                }
+            }
+        }
     }
 }

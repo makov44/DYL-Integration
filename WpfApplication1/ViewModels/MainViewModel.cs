@@ -18,6 +18,7 @@ using DYL.EmailIntegration.Properties;
 using log4net;
 using mshtml;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using MessageBox = System.Windows.MessageBox;
 using WebBrowser = System.Windows.Forms.WebBrowser;
 
 namespace DYL.EmailIntegration.ViewModels
@@ -29,8 +30,10 @@ namespace DYL.EmailIntegration.ViewModels
         public ICommand LogOutCommand => new DelegateCommand(param => { LogOut_OnClick(); });
         public ICommand BackCommand => new DelegateCommand(param => { Back_OnClick();});
         public ICommand ForwardCommand => new DelegateCommand(param => { Forward_OnClick();});
-        public ICommand SendEmailsCommand => new DelegateCommand(param=> { New_OnClick(); });
+        public ICommand SendEmailsCommand => new DelegateCommand(param=> { SendEmails_OnClick(); });
         public ICommand SendCommand => new DelegateCommand(param => { Send_OnClick(); });
+        public ICommand DeleteCommand => new DelegateCommand(param => { Delete_OnClick(); });
+        public ICommand DeleteAllCommand => new DelegateCommand(param => { DeleteAll_OnClick(); });
         public ICommand RefreshCommand => new DelegateCommand(param => { Refresh_OnClick(); });
         public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); });
         #endregion
@@ -40,7 +43,7 @@ namespace DYL.EmailIntegration.ViewModels
         private readonly WebBrowser _browser;
         private HtmlDocument _document;
         private readonly string _startPage =Settings.Default.AllStatesGatewayUrl;
-        private readonly string _webEmailPage = Settings.Default.AllStatesOutlookUrl;
+        private readonly string _outlookHomePage = Settings.Default.AllStatesOutlookUrl;
         private PageName _currentPage;
 
         private int _remainingEmails;
@@ -95,6 +98,28 @@ namespace DYL.EmailIntegration.ViewModels
             {
                 _userName = value;
                 RaisePropertyChangedEvent("UserName");
+            }
+        }
+
+        private Visibility _emailsListLayout;
+        public Visibility EmailsListLayout
+        {
+            get { return _emailsListLayout; }
+            set
+            {
+                _emailsListLayout = value;
+                RaisePropertyChangedEvent("EmailsListLayout");
+            }
+        }
+
+        private Visibility _emailLayout;
+        public Visibility EmailLayout
+        {
+            get { return _emailLayout; }
+            set
+            {
+                _emailLayout = value;
+                RaisePropertyChangedEvent("EmailLayout");
             }
         }
 
@@ -153,6 +178,7 @@ namespace DYL.EmailIntegration.ViewModels
             LogInLayoutVisibility = Visibility.Visible;
             MainLayoutVisibility = Visibility.Collapsed;
             IsLoginInvalid = Visibility.Collapsed;
+            ShowEmailPage(false);
         }
 
         private void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -245,13 +271,37 @@ namespace DYL.EmailIntegration.ViewModels
                 sendButton.Focus();
                 sendButton.InvokeMember("click");
                 _currentPage = PageName.Home;
-                _browser.Navigate(_webEmailPage);
+                _browser.Navigate(_outlookHomePage);
                 SentEmails++;
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
             }
+        }
+
+        private void Delete_OnClick()
+        {
+            try
+            {
+                _currentPage = PageName.Home;
+                _browser.Navigate(_outlookHomePage);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+            }
+        }
+
+        private void DeleteAll_OnClick()
+        {
+            if (Context.EmailQueue.IsEmpty)
+                return;
+
+            var result = MessageBox.Show("Are you sure you want to delete all emails?", "Warning", MessageBoxButton.OKCancel,
+                MessageBoxImage.Warning);
+            if(result == MessageBoxResult.OK)
+                Context.EmailQueue.Clear();
         }
 
         private void Refresh_OnClick()
@@ -282,8 +332,15 @@ namespace DYL.EmailIntegration.ViewModels
             _browser.GoForward();
         }
 
-        private void New_OnClick()
+        private void SendEmails_OnClick()
         {
+            if (Context.EmailQueue.Count <= 0)
+            {
+                MessageBox.Show("There are no emails to send.", "Warning", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             var element = _document.GetElementById("newmsgc");
             if (element != null)
             {
@@ -351,6 +408,7 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void NewEmailHandler()
         {
+            ShowEmailPage(true);
             Email email;
             Context.EmailQueue.TryDequeue(out email);
             if (email == null)
@@ -400,6 +458,7 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void HomeEmailHandler()
         {
+            
             if (Context.EmailQueue.Count > 0)
             {
                 Task.Run(()=>
@@ -407,9 +466,27 @@ namespace DYL.EmailIntegration.ViewModels
                     System.Windows.Application.Current.Dispatcher.Invoke(() =>
                     {
                         Task.Delay(1000);
-                        New_OnClick();
+                        SendEmails_OnClick();
                     });
                 });
+            }
+            else
+            {
+                ShowEmailPage(false);
+            }
+        }
+
+        private void ShowEmailPage(bool flag)
+        {
+            if (flag)
+            {
+                EmailLayout = Visibility.Visible;
+                EmailsListLayout = Visibility.Collapsed;
+            }
+            else
+            {
+                EmailLayout = Visibility.Collapsed;
+                EmailsListLayout = Visibility.Visible;
             }
         }
     }
