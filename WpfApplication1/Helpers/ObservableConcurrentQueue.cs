@@ -14,7 +14,7 @@ using System.Windows.Threading;
 
 namespace DYL.EmailIntegration.Helpers
 {
-    public class ObservableConcurrentBag<T> : ConcurrentQueue<T>, INotifyCollectionChanged
+    public class ObservableConcurrentQueue<T> : ConcurrentQueue<T>, INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 

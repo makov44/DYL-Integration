@@ -32,6 +32,6 @@ namespace DYL.EmailIntegration.Models
             }
         }
       
-        internal static ObservableConcurrentBag<Email> EmailQueue { get; set; }
+        internal static ObservableConcurrentQueue<Email> EmailQueue { get; set; }
     }
 }

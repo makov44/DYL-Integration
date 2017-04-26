@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace DYL.EmailIntegration.Domain.Data
 {
-    public class Credentials
+    public class Status
     {
-        public string email { get; set; }
+        public string EmailId { get; set; }
 
-        public string password { get; set; }
+        public string StatusName { get; set; }
     }
 }

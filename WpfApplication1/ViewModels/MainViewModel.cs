@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace DYL.EmailIntegration.ViewModels
         private readonly string _startPage =Settings.Default.AllStatesGatewayUrl;
         private readonly string _outlookHomePage = Settings.Default.AllStatesOutlookUrl;
         private PageName _currentPage;
-
+        private readonly ConcurrentQueue<Email> _currentEmailQueue = new ConcurrentQueue<Email>();
         private int _remainingEmails;
         public int RemainingEmails
         {
@@ -273,17 +274,35 @@ namespace DYL.EmailIntegration.ViewModels
                 _currentPage = PageName.Home;
                 _browser.Navigate(_outlookHomePage);
                 SentEmails++;
+               PostEmailStatus("sent");
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
+                PostEmailStatus("failed");
             }
+        }
+
+        private void PostEmailStatus(string status)
+        {
+            Email email;
+            _currentEmailQueue.TryDequeue(out email);
+
+            if (email == null)
+                return;
+
+            ApplicationService.PostEmailStatus(new Status
+            {
+                EmailId = email.Id,
+                StatusName = status
+            });
         }
 
         private void Delete_OnClick()
         {
             try
             {
+                PostEmailStatus("deleted");
                 _currentPage = PageName.Home;
                 _browser.Navigate(_outlookHomePage);
             }
@@ -300,8 +319,26 @@ namespace DYL.EmailIntegration.ViewModels
 
             var result = MessageBox.Show("Are you sure you want to delete all emails?", "Warning", MessageBoxButton.OKCancel,
                 MessageBoxImage.Warning);
-            if(result == MessageBoxResult.OK)
-                Context.EmailQueue.Clear();
+            if (result != MessageBoxResult.OK)
+                return;
+
+            lock (Context.EmailQueue)
+            {
+                var count = Context.EmailQueue.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    Email email;
+                    Context.EmailQueue.TryDequeue(out email);
+                    if (email == null)
+                        continue;
+
+                    ApplicationService.PostEmailStatus(new Status
+                    {
+                        EmailId = email.Id,
+                        StatusName = "deleted"
+                    });
+                }
+            }
         }
 
         private void Refresh_OnClick()
@@ -417,6 +454,10 @@ namespace DYL.EmailIntegration.ViewModels
                 return;
             }
 
+            ClearCurrentEmailQueue();
+
+            _currentEmailQueue.Enqueue(email);
+
             var frame = _document.GetElementById("ifBdy");
             var txtSubj = _document.GetElementById("txtSubj");
             var divTo = _document.GetElementById("divTo");
@@ -454,6 +495,23 @@ namespace DYL.EmailIntegration.ViewModels
             head?.AppendChild(scriptEl);
 
             _document.InvokeScript("replaceIFrameContent");
+        }
+
+        private void ClearCurrentEmailQueue()
+        {
+            if (_currentEmailQueue.IsEmpty)
+                return;
+
+            lock (_currentEmailQueue)
+            {
+                var count = _currentEmailQueue.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    Email oldEmail;
+                    _currentEmailQueue.TryDequeue(out oldEmail);
+                    Log.Error($"Current email queue is not empty, possible race condition. EmailId={oldEmail.Id}");
+                }
+            }
         }
 
         private void HomeEmailHandler()

@@ -53,9 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\BaseHttpResponse.cs" />
     <Compile Include="Data\Email.cs" />
-    <Compile Include="Data\EmailsHttpResponse.cs" />
+    <Compile Include="Contracts\EmailsHttpResponse.cs" />
     <Compile Include="Data\Credentials.cs" />
+    <Compile Include="Data\Status.cs" />
+    <Compile Include="Contracts\StatusHttpRequest.cs" />
     <Compile Include="EncryptionService.cs" />
     <Compile Include="HttpService.cs" />
     <Compile Include="IsolatedStorageService.cs" />

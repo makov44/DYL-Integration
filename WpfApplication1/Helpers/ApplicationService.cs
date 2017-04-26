@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DYL.EmailIntegration.Domain;
+using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Models;
 using log4net;
@@ -23,12 +24,12 @@ namespace DYL.EmailIntegration.Helpers
                     {
                         session_key = key
                     };
-                    var response = await HttpService.GetEmails("api/outlook/emails", session);
-                    if (response == null || response.Count == 0 || response.Data == null)
+                    var response = await HttpService.GetEmails(Constants.GetEmailsUrl, session);
+                    if (response == null || response.Total == 0 || response.Data == null)
                         return;
                     response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
 
-                    if (Context.EmailQueue.Count > 1000)
+                    if (Context.EmailQueue.Count > 200)
                         Log.Error("Email Queue has more then 1000 items.");
                 }
                 catch (Exception ex)
@@ -42,7 +43,7 @@ namespace DYL.EmailIntegration.Helpers
         {
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
-                var key = await HttpService.GetSessionKey("api/outlook/login", credentials);
+                var key = await HttpService.GetSessionKey(Constants.LoginUrl, credentials);
                 callback(key);
             });
         }
@@ -95,6 +96,18 @@ namespace DYL.EmailIntegration.Helpers
                     ? new Session(key, DateTime.Now)
                     : null;
             });
+        }
+
+        public static void PostEmailStatus(Status status)
+        {
+            var statusHttpRequest = new StatusHttpRequest
+            {
+                id = status.EmailId,
+                status = status.StatusName,
+                session_key = Context.Session.Key
+            };
+            Task.Run(async () => 
+                 await HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest));
         }
     }
 }

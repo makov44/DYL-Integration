@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using log4net;
 using log4net.Config;
@@ -30,14 +31,15 @@ namespace DYL.EmailIntegration.Domain
             {
                 using (var response = await Client.PostAsJsonAsync(requestUrl, credentials))
                 {
+                    var result = await response.Content.ReadAsAsync<SessionKey>();
+
                     if (!response.IsSuccessStatusCode)
                     {
-                        Log.Error($"Failed to login, statusCode:{response.StatusCode}, reason:{response.ReasonPhrase}");
-                        return String.Empty;
+                        Log.Error($"Failed to login, statusCode:{response.StatusCode}, " +
+                                  $"reason:{response.ReasonPhrase}, message:{result?.message}");
+                        return string.Empty;
                     }
-                       
-
-                    var result = await response.Content.ReadAsAsync<SessionKey>();
+                   
                     response.Content.Dispose();
 
                     return result?.session_key;
@@ -46,7 +48,7 @@ namespace DYL.EmailIntegration.Domain
             catch (Exception ex)
             {
                Log.Error(ex);
-               return String.Empty;
+               return string.Empty;
             }
         }
 
@@ -56,10 +58,15 @@ namespace DYL.EmailIntegration.Domain
             {
                 using (var response = await Client.PostAsJsonAsync(requestUrl, sessionkey))
                 {
-                    if (!response.IsSuccessStatusCode)
-                        return new EmailsHttpResponse();
-
                     var result = await response.Content.ReadAsAsync<EmailsHttpResponse>();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Log.Error($"Failed to get emails, statusCode:{response.StatusCode}, " +
+                                  $"reason:{response.ReasonPhrase}, message:{result?.Message}");
+                        return new EmailsHttpResponse();
+                    }
+                 
                     response.Content.Dispose();
 
                     return result;
@@ -69,6 +76,33 @@ namespace DYL.EmailIntegration.Domain
             {
                 Log.Error(ex);
                 return new EmailsHttpResponse();
+            }
+        }
+
+        public static async Task<BaseHttpResponse> PostStatus(string requestUrl, StatusHttpRequest status)
+        {
+            try
+            {
+                using (var response = await Client.PostAsJsonAsync(requestUrl, status))
+                {
+                    var result = await response.Content.ReadAsAsync<BaseHttpResponse>();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Log.Error($"Failed to post status, statusCode:{response.StatusCode}, " +
+                                  $"reason:{response.ReasonPhrase}, message:{result?.Message}");
+                        return new BaseHttpResponse();
+                    }
+
+                    response.Content.Dispose();
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                return new BaseHttpResponse();
             }
         }
     }

@@ -43,7 +43,7 @@ namespace DYL.EmailIntegration
         {
             log4net.Config.XmlConfigurator.Configure();
             Log.Info("Application Started");
-            Context.EmailQueue = new ObservableConcurrentBag<Email>();
+            Context.EmailQueue = new ObservableConcurrentQueue<Email>();
             HttpService.CreateService(Settings.Default.BaseUrl);
             ApplicationService.AutoLogin();
             _emailsTimer.Start(ApplicationService.EmailTimerEventHandler);
