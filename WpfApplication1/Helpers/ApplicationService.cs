@@ -20,7 +20,7 @@ namespace DYL.EmailIntegration.Helpers
             {
                 try
                 {
-                    var session = new SessionKey
+                    var session = new SessionKeyHttpRequest
                     {
                         session_key = key
                     };
@@ -43,7 +43,12 @@ namespace DYL.EmailIntegration.Helpers
         {
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
-                var key = await HttpService.GetSessionKey(Constants.LoginUrl, credentials);
+                var credentialsHttpRequest = new CredentialsHttpRequest
+                {
+                    password = credentials.password,
+                    email = credentials.email
+                };
+                var key = await HttpService.GetSessionKey(Constants.LoginUrl, credentialsHttpRequest);
                 callback(key);
             });
         }

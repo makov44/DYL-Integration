@@ -15,7 +15,7 @@ using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Helpers;
 using DYL.EmailIntegration.Models;
-using DYL.EmailIntegration.Properties;
+using DYL.EmailIntegration.UI.Properties;
 using log4net;
 using mshtml;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;

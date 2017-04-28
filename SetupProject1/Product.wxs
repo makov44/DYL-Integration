@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="DF5C828B-3442-4FE6-9495-A134A8374043" Name="DYL.EmailIntegration" Language="1033" Version="1.0.0.1" Manufacturer="DYL" 
+           UpgradeCode="699C2727-72C3-4C51-836E-6648D5D8F725">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
+		<MediaTemplate EmbedCab="yes"/>
+
+    <Feature Id="ft_DYL.EmailIntegration" Title="Emails DYL" Level="1">
+      <ComponentGroupRef Id="cg_DYL.EmailIntegration" />
+    </Feature>
+	</Product>
+
+	<Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="AppRootDirectory" Name="DYL">
+          <Directory Id="INSTALLFOLDERUI" Name="EmailIntegration.UI" />
+          <Directory Id="INSTALLFOLDERSERVICE" Name="EmailIntegration.Service" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="DYL.Shotcuts" Name="DYL"/>
+      </Directory>
+    </Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="cg_DYL.EmailIntegration">
+		  <Component Id="c_DYL.EmailIntegration.Service" Guid="{3846bd25-9056-450b-a480-00aa203ef560}" Directory="INSTALLFOLDERSERVICE">
+		    <File Id="DYL.EmailIntegration.Service.exe" Name="DYL.EmailIntegration.Service.exe" Source="$(var.DYL.EmailIntegration.Service.TargetPath)" Checksum="yes"/>
+		    <File Id="DYL.EmailIntegration.Domain.dll" Name="DYL.EmailIntegration.Domain.dll" Source="$(var.DYL.EmailIntegration.Service.TargetDir)DYL.EmailIntegration.Domain.dll" Checksum="yes"/>
+		    <File Id="log4net.dll" Name="log4net.dll" Source="$(var.DYL.EmailIntegration.Service.TargetDir)log4net.dll" Checksum="yes"/>
+		    <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DYL.EmailIntegration.Service.TargetDir)Newtonsoft.Json.dll" Checksum="yes"/>
+		    <File Id="System.Net.Http.Formatting.dll" Name="System.Net.Http.Formatting.dll" Source="$(var.DYL.EmailIntegration.Service.TargetDir)System.Net.Http.Formatting.dll" Checksum="yes"/>
+		    <File Id="DYL.EmailIntegration.Service.exe.config" Name="DYL.EmailIntegration.Service.exe.config" Source="$(var.DYL.EmailIntegration.Service.TargetDir)DYL.EmailIntegration.Service.exe.config" Checksum="yes"/>
+		    <ServiceInstall
+		      Id="ServiceInstaller"
+		      Type="ownProcess"
+		      Vital="yes"
+		      Name="DYLNotificationService"
+		      DisplayName="DYL Notification Service"
+		      Description="Notify DYL user about new emails."
+		      Account="LocalSystem"
+		      Start="auto"
+		      ErrorControl="ignore"
+		      Interactive="no">
+		    </ServiceInstall>
+		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="DYLNotificationService" Wait="yes" />
+		    <File Id="logo.png" Name="logo.png" Source="$(var.DYL.EmailIntegration.Service.TargetDir)logo.png" Checksum="yes"/>
+        <RemoveFolder Id="Remove.INSTALLFOLDERSERVICE" On="uninstall" />
+      </Component>
+      <Component Id="c_DYL.EmailIntegration.UI"  Guid="31b7668f-d6d2-4595-bcbb-89bc693f7e03" Directory="INSTALLFOLDERUI">
+        <File Id="DYL.EmailIntegration.UI.exe" Name="DYL.EmailIntegration.UI.exe" Source="$(var.DYL.EmailIntegration.UI.TargetPath)" Checksum="yes"/>
+        <File Id="UI.DYL.EmailIntegration.Domain.dll" Name="DYL.EmailIntegration.Domain.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)DYL.EmailIntegration.Domain.dll" Checksum="yes"/>
+        <File Id="UI.log4net.dll" Name="log4net.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)log4net.dll" Checksum="yes"/>
+        <File Id="UI.Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)Newtonsoft.Json.dll" Checksum="yes"/>
+        <File Id="UI.System.Net.Http.Formatting.dll" Name="System.Net.Http.Formatting.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)System.Net.Http.Formatting.dll" Checksum="yes"/>
+        <File Id="DYL.EmailIntegration.UI.exe.config" Name="DYL.EmailIntegration.UI.exe.config" Source="$(var.DYL.EmailIntegration.UI.TargetDir)DYL.EmailIntegration.UI.exe.config" Checksum="yes"/>
+        <File Id="Interop.SHDocVw.dll" Name="Interop.SHDocVw.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)Interop.SHDocVw.dll" Checksum="yes"/>
+        <File Id="UI.logo.png" Name="logo.png" Source="$(var.DYL.EmailIntegration.UI.TargetDir)logo.png" Checksum="yes"/>
+        <!-- This is needed to tell COM what process to start to activate the COM server for this CLSID -->
+        <RegistryValue Root="HKCU" Key="Software\Classes\CLSID\{23A5B06E-20BB-4E7E-A0AC-6982ED6A6041}\LocalServer32" Type="string" Value="[#DYL.EmailIntegration.UI.exe]" KeyPath="yes" />
+        <RemoveFolder Id="Remove.INSTALLFOLDERUI" On="uninstall" />
+      </Component>
+      <!-- This creates a start menu shortcut -->
+      <Component Id="ApplicationShortcut" Guid="{E49F92FF-D941-4745-ABD8-D2702B9BFD13}" Directory="DYL.Shotcuts">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="Emails DYL" Description="Sends DYL emails using Outlook Web" Target="[INSTALLFOLDERUI]DYL.EmailIntegration.UI.exe" WorkingDirectory="INSTALLFOLDERUI">
+          <!-- Set the AppID in order to get toast notifications to work -->
+          <ShortcutProperty Key="System.AppUserModel.ID" Value="DYL.NotificationService"></ShortcutProperty>
+          <!-- Set the ToastActivatorCLSID in order to get notifications working in Action Center -->
+          <ShortcutProperty Key="System.AppUserModel.ToastActivatorCLSID" Value="{23A5B06E-20BB-4E7E-A0AC-6982ED6A6041}"></ShortcutProperty>
+        </Shortcut>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\DesktopToasts" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <RemoveFolder Id="Remove.DYL.Shotcuts" On="uninstall" />
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

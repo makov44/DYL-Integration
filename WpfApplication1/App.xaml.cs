@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -8,7 +9,7 @@ using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Helpers;
 using DYL.EmailIntegration.Models;
-using DYL.EmailIntegration.Properties;
+using DYL.EmailIntegration.UI.Properties;
 using log4net;
 
 namespace DYL.EmailIntegration
@@ -24,6 +25,8 @@ namespace DYL.EmailIntegration
        
         public App()
         {
+            
+            log4net.Config.XmlConfigurator.Configure();
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += ExceptionEventHandler;
             _emailsTimer = new LocalTimer(Settings.Default.ServiceInterval, "Email");
@@ -41,7 +44,6 @@ namespace DYL.EmailIntegration
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            log4net.Config.XmlConfigurator.Configure();
             Log.Info("Application Started");
             Context.EmailQueue = new ObservableConcurrentQueue<Email>();
             HttpService.CreateService(Settings.Default.BaseUrl);

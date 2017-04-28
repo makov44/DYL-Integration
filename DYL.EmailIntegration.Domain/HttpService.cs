@@ -25,7 +25,7 @@ namespace DYL.EmailIntegration.Domain
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public static async Task<string> GetSessionKey(string requestUrl, Credentials credentials)
+        public static async Task<string> GetSessionKey(string requestUrl, CredentialsHttpRequest credentials)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace DYL.EmailIntegration.Domain
             }
         }
 
-        public static async Task<EmailsHttpResponse> GetEmails(string requestUrl, SessionKey sessionkey)
+        public static async Task<EmailsHttpResponse> GetEmails(string requestUrl, SessionKeyHttpRequest sessionkey)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace DYL.EmailIntegration.Domain
                                   $"reason:{response.ReasonPhrase}, message:{result?.Message}");
                         return new EmailsHttpResponse();
                     }
-                 
+
                     response.Content.Dispose();
 
                     return result;
