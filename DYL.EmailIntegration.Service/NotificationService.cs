@@ -41,6 +41,7 @@ namespace DYL.EmailIntegration.Service
 
         private void NotificationTimeHandler()
         {
+            Log.Info("Notification timer elapsed event raised.");
             var total = GetNewEmailsTotal();
             if (total != null && total > 0)
                 ShowToastNotification((int)total);
@@ -82,7 +83,7 @@ namespace DYL.EmailIntegration.Service
 
 
                 // Specify the absolute path to an image as a URI
-                String imagePath = new System.Uri(Path.GetFullPath("logo.png")).AbsoluteUri;
+                String imagePath = Path.GetFullPath("logo.png");
                 XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
                 imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
 
@@ -94,6 +95,7 @@ namespace DYL.EmailIntegration.Service
 
                 // Show the toast. Be sure to specify the AppUserModelId on your application's shortcut!
                 ToastNotificationManager.CreateToastNotifier(APP_ID).Show(toast);
+                Log.Info($"Show toast notification. There are {total} new emails");
             }
             catch (Exception ex)
             {
