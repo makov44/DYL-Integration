@@ -67,5 +67,23 @@ namespace DYL.EmailIntegration.UI.Properties {
                 return ((string)(this["WcfNetPipeUrl"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("45000")]
+        public int SessionExpirationInterval {
+            get {
+                return ((int)(this["SessionExpirationInterval"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int MaxSizeEmailsQueue {
+            get {
+                return ((int)(this["MaxSizeEmailsQueue"]));
+            }
+        }
     }
 }

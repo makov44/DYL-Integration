@@ -52,6 +52,5 @@ namespace DYL.EmailIntegration.Domain
             _timer.Dispose();
             Log.Info($"{_name} timer stoped.");
         }
-       
     }
 }

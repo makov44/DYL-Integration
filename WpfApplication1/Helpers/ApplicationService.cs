@@ -18,6 +18,12 @@ namespace DYL.EmailIntegration.Helpers
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static void GetEmails(string key)
         {
+            if (Context.EmailQueue.Count > Settings.Default.MaxSizeEmailsQueue)
+            {
+                Log.Error("Email Queue has reached the limit of 200 items.");
+                return;
+            }
+               
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
                 try
@@ -30,9 +36,6 @@ namespace DYL.EmailIntegration.Helpers
                     if (response == null || response.Total == 0 || response.Data == null)
                         return;
                     response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
-
-                    if (Context.EmailQueue.Count > 200)
-                        Log.Error("Email Queue has more then 1000 items.");
                 }
                 catch (Exception ex)
                 {
@@ -78,21 +81,17 @@ namespace DYL.EmailIntegration.Helpers
                 return;
             }
 
-            if (!Context.EmailQueue.IsEmpty)
-            {
-                Log.Info("Email queue is not empty.");
-                return;
-            }
-          
             GetEmails(Context.Session.Key);
         }
 
-        public static void SessionTimerEventHandler()
+        public static void RenewSession()
         {
             Log.Info("Session timer elapsed event raised.");
+
             var credentials = Authentication.LoadCredentials(Constants.TokenFileName);
             if (credentials == null)
             {
+                Log.Error("Failed to load credentials.");
                 System.Windows.Application.Current.Dispatcher.Invoke(() => { Context.Session = null; });
                 return;
             }

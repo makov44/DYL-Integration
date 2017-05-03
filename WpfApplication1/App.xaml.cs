@@ -59,7 +59,7 @@ namespace DYL.EmailIntegration
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += ExceptionEventHandler;
             _emailsTimer = new LocalTimer(Settings.Default.ServiceInterval, "Email");
-            _sessionTimer = new LocalTimer(48 * 3600 * 1000, "Session");
+            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
         }
 
       
@@ -117,7 +117,7 @@ namespace DYL.EmailIntegration
             HttpService.CreateService(Settings.Default.BaseUrl);
             ApplicationService.AutoLogin();
             _emailsTimer.Start(ApplicationService.EmailTimerEventHandler);
-            _sessionTimer.Start(ApplicationService.SessionTimerEventHandler);
+            _sessionTimer.Start(ApplicationService.RenewSession);
             base.OnStartup(e);
         }
 

@@ -25,10 +25,12 @@ namespace DYL.EmailIntegration.Service
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly LocalTimer _emailsTimer;
+        private readonly LocalTimer _sessionTimer;
         private readonly ServiceHost _serviceHost;
         public NotificationService()
         {
             _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval, "Notification");
+            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
             _serviceHost = ApplicationService.CreateNetPipeHost();
             InitializeComponent();
         }
@@ -54,8 +56,7 @@ namespace DYL.EmailIntegration.Service
             }
            
             _emailsTimer.StartTask(ApplicationService.NotificationTimeHandler);
-          //  _sessionTimer.Start(ApplicationService.SessionTimerEventHandler);
-
+            _sessionTimer.StartTask(ApplicationService.RenewSession);
         }
 
        

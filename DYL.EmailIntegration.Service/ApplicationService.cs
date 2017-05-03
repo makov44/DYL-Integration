@@ -62,6 +62,30 @@ namespace DYL.EmailIntegration.Service
                 ShowToastNotification((int)total);
         }
 
+        public static async Task RenewSession()
+        {
+            Log.Info("Session timer elapsed event raised.");
+           
+            var credentials = Authentication.LoadCredentials(Constants.TokenFileName);
+            if (credentials == null)
+            {
+                Log.Error("Failed to load credentials.");
+                Context.Session = null;
+                return;
+            }
+
+            var key =  await GetNewSessionKey(credentials).ConfigureAwait(false);
+
+            if (string.IsNullOrEmpty(key))
+            {
+                Log.Error("Failed to get new session key.");
+                Context.Session = null;
+                return;
+            }
+
+            Context.Session = new Session(key, DateTime.Now);
+        }
+
         private static async Task<int?> GetNewEmailsTotal()
         {
             var key = string.Empty;
