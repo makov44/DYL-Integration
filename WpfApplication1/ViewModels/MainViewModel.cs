@@ -33,10 +33,11 @@ namespace DYL.EmailIntegration.ViewModels
         public ICommand ForwardCommand => new DelegateCommand(param => { Forward_OnClick();});
         public ICommand SendEmailsCommand => new DelegateCommand(param=> { SendEmails_OnClick(); });
         public ICommand SendCommand => new DelegateCommand(param => { Send_OnClick(); });
+        public ICommand GetEmailsCommand => new DelegateCommand(param => { GetEmails_OnClick(); });
         public ICommand DeleteCommand => new DelegateCommand(param => { Delete_OnClick(); });
         public ICommand DeleteAllCommand => new DelegateCommand(param => { DeleteAll_OnClick(); });
         public ICommand RefreshCommand => new DelegateCommand(param => { Refresh_OnClick(); });
-        public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); });
+        public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); }); 
         #endregion
 
         #region properties
@@ -94,7 +95,7 @@ namespace DYL.EmailIntegration.ViewModels
         private string _userName;
         public string UserName
         {
-            get { return _userName; }
+            get { return string.IsNullOrEmpty(_userName) ? "Name" : _userName; }
             set
             {
                 _userName = value;
@@ -283,6 +284,11 @@ namespace DYL.EmailIntegration.ViewModels
             }
         }
 
+        private void GetEmails_OnClick()
+        {
+           
+        }
+
         private void PostEmailStatus(string status)
         {
             Email email;
@@ -409,9 +415,14 @@ namespace DYL.EmailIntegration.ViewModels
 
                 Context.Session = !string.IsNullOrEmpty(key) ? new Session(key, DateTime.Now) : null;
 
-                if (!string.IsNullOrEmpty(key))
-                    Authentication.SaveCredentials(credentials);
+                if (string.IsNullOrEmpty(key))
+                    return;
+
+                Authentication.SaveCredentials(credentials);
+                ApplicationService.AutoLoginNotificationService(credentials);
             });
+
+           
         }
         private void LogOut_OnClick()
         {

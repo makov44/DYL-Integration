@@ -48,7 +48,7 @@
 		      Interactive="no">
 		    </ServiceInstall>
 		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="DYLNotificationService" Wait="yes" />
-		    <File Id="logo.png" Name="logo.png" Source="$(var.DYL.EmailIntegration.Service.TargetDir)logo.png" Checksum="yes"/>
+		    <File Id="email_adapter_logo.png" Name="email_adapter_logo.png" Source="$(var.DYL.EmailIntegration.Service.TargetDir)email_adapter_logo.png" Checksum="yes"/>
         <RemoveFolder Id="Remove.INSTALLFOLDERSERVICE" On="uninstall" />
       </Component>
       <Component Id="c_DYL.EmailIntegration.UI"  Guid="31b7668f-d6d2-4595-bcbb-89bc693f7e03" Directory="INSTALLFOLDERUI">
@@ -59,7 +59,7 @@
         <File Id="UI.System.Net.Http.Formatting.dll" Name="System.Net.Http.Formatting.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)System.Net.Http.Formatting.dll" Checksum="yes"/>
         <File Id="DYL.EmailIntegration.UI.exe.config" Name="DYL.EmailIntegration.UI.exe.config" Source="$(var.DYL.EmailIntegration.UI.TargetDir)DYL.EmailIntegration.UI.exe.config" Checksum="yes"/>
         <File Id="Interop.SHDocVw.dll" Name="Interop.SHDocVw.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)Interop.SHDocVw.dll" Checksum="yes"/>
-        <File Id="UI.logo.png" Name="logo.png" Source="$(var.DYL.EmailIntegration.UI.TargetDir)logo.png" Checksum="yes"/>
+        <File Id="UI.email_adapter_logo.png" Name="email_adapter_logo.png" Source="$(var.DYL.EmailIntegration.UI.TargetDir)email_adapter_logo.png" Checksum="yes"/>
         <!-- This is needed to tell COM what process to start to activate the COM server for this CLSID -->
         <RegistryValue Root="HKCU" Key="Software\Classes\CLSID\{23A5B06E-20BB-4E7E-A0AC-6982ED6A6041}\LocalServer32" Type="string" Value="[#DYL.EmailIntegration.UI.exe]" KeyPath="yes" />
         <RemoveFolder Id="Remove.INSTALLFOLDERUI" On="uninstall" />

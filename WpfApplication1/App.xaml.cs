@@ -3,11 +3,14 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.ServiceModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using DYL.EmailIntegration.Domain;
+using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Helpers;
 using DYL.EmailIntegration.Models;
@@ -22,49 +25,80 @@ namespace DYL.EmailIntegration
     /// </summary>
     public partial class App : Application
     {
-        [DllImport("user32.dll")]
-        private static extern Boolean ShowWindow(IntPtr hWnd, Int32 nCmdShow);
-        [DllImport("user32.dll")]
-        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        /// <summary> 
+        /// Mutex used to allow only one instance. 
+        /// </summary> 
+        private Mutex _mutex;
 
-        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-        const UInt32 SWP_NOSIZE = 0x0001;
-        const UInt32 SWP_NOMOVE = 0x0002;
-        const UInt32 SWP_SHOWWINDOW = 0x0040;
+        /// <summary> 
+        /// Name of mutex to use. Should be unique for all applications. 
+        /// </summary> 
+        public const string MutexName = "DYL.EmailIntegration.Mutex";
+
+        /// <summary> 
+        /// Sets the foreground window. 
+        /// </summary> 
+        /// <param name="hWnd">Window handle to bring to front.</param> 
+        /// <returns></returns> 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
 
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly LocalTimer _emailsTimer;
-        private readonly LocalTimer _sessionTimer;
+        private LocalTimer _emailsTimer;
+        private LocalTimer _sessionTimer;
        
         public App()
         {
-            if (CheckIfApplicationAlreadyRuning())
-                return;
+            TryToStartApplication(SetupApp);
+        }
 
+        private void SetupApp()
+        {
             log4net.Config.XmlConfigurator.Configure();
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += ExceptionEventHandler;
             _emailsTimer = new LocalTimer(Settings.Default.ServiceInterval, "Email");
-           _sessionTimer = new LocalTimer(48 * 3600 * 1000, "Session");
+            _sessionTimer = new LocalTimer(48 * 3600 * 1000, "Session");
         }
 
-        private static bool CheckIfApplicationAlreadyRuning()
-        {
-            var currentProcess = Process.GetCurrentProcess();
-            var runningProcess = (from process in Process.GetProcesses()
-                where
-                process.Id != currentProcess.Id &&
-                process.ProcessName.Equals(
-                    currentProcess.ProcessName,
-                    StringComparison.Ordinal)
-                select process).FirstOrDefault();
+      
 
-            if (runningProcess == null)
-                return false;
-          
-            ShowWindow(runningProcess.MainWindowHandle, (int)ShowWindowCommands.SW_MAXIMIZE);
-            SetWindowPos(runningProcess.MainWindowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-            return true;
+        private void TryToStartApplication(Action callback)
+        {
+            // Try to grab mutex 
+            bool createdNew;
+            _mutex = new Mutex(true, MutexName, out createdNew);
+
+            if (!createdNew)
+            {
+                // Bring other instance to front and exit. 
+                var current = Process.GetCurrentProcess();
+                foreach (var process in Process.GetProcessesByName(current.ProcessName))
+                {
+                    if (process.Id != current.Id)
+                    {
+                        SetForegroundWindow(process.MainWindowHandle);
+                        break;
+                    }
+                }
+                Application.Current.Shutdown();
+            }
+            else
+            {
+                callback();
+                Exit += CloseMutexHandler;
+            }
+        }
+
+        /// <summary> 
+        /// Handler that closes the mutex. 
+        /// </summary> 
+        /// <param name="sender">Sender of the event.</param> 
+        /// <param name="e">Event arguments.</param> 
+        protected virtual void CloseMutexHandler(object sender, EventArgs e)
+        {
+            _mutex?.Close();
         }
 
         static void ExceptionEventHandler(object sender, UnhandledExceptionEventArgs args)
@@ -92,16 +126,9 @@ namespace DYL.EmailIntegration
 
         protected override void OnExit(ExitEventArgs e)
         {
-            if (!Context.EmailQueue.IsEmpty)
-            {
-                Log.Info("Email queue is not empty.");
-                MessageBox.Show("Email queue is not empty. Please review remaning emails.",
-                    "WARNING", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            _emailsTimer.Stop();
-            _sessionTimer.Stop();
-            Log.Info("Application Exited");
+            _emailsTimer?.Stop();
+            _sessionTimer?.Stop();
+            Log?.Info("Application Exited");
             base.OnExit(e);
         }
     }

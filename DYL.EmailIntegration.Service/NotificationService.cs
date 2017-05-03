@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.ServiceModel;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using Windows.UI.Notifications;
 using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Service.Helpers;
+using DYL.EmailIntegration.Service.Properties;
 using log4net;
 
 namespace DYL.EmailIntegration.Service
@@ -23,19 +25,36 @@ namespace DYL.EmailIntegration.Service
         private const string APP_ID = "DYL.NotificationService";
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly LocalTimer _emailsTimer;
+        private readonly ServiceHost _serviceHost;
         public NotificationService()
         {
-            _emailsTimer = new LocalTimer(30000, "Notification");
+            _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval, "Notification");
+            _serviceHost = ApplicationService.CreateNetPipeHost();
             InitializeComponent();
         }
 
         protected override void OnStart(string[] args)
         {
-            Log.Info("Sync service started");
-            HttpService.CreateService("http://dyl1-cy.getdyl.com");
+            Log.Info("Notification service started");
+            if (string.IsNullOrEmpty(Settings.Default.BaseUrl))
+            {
+                Log.Error("Settings property 'BaseUrl' in config file is empty.");
+                return;
+            }
+            HttpService.CreateService(Settings.Default.BaseUrl);
             NotificationActivator.Initialize();
+            try
+            {
+                _serviceHost?.Open();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                _serviceHost?.Abort();
+            }
+           
             _emailsTimer.Start(NotificationTimeHandler);
-            //    _sessionTimer.Start(ApplicationService.SessionTimerEventHandler);
+          //  _sessionTimer.Start(ApplicationService.SessionTimerEventHandler);
 
         }
 
@@ -49,18 +68,18 @@ namespace DYL.EmailIntegration.Service
 
         protected override void OnStop()
         {
-            _emailsTimer.Stop();
             NotificationActivator.Uninitialize();
-            Log.Info("Sync service Exited");
+            _serviceHost?.Close();
+            _emailsTimer.Stop();
+            Log.Info("Notification service Exited");
         }
-
 
         private int? GetNewEmailsTotal()
         {
             var credentialsHttpRequest = new CredentialsHttpRequest
             {
                 password = "leads",
-                email = "mfrager+joebob101@gmail.com"
+                email = "65654@sam.com"
             };
             var key = HttpService.GetSessionKey(Constants.LoginUrl, credentialsHttpRequest).Result;
             var response = HttpService.GetEmails(Constants.GetEmailsTotalUrl, new SessionKeyHttpRequest { session_key = key}).Result;

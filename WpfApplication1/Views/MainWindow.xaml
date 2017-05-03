@@ -6,58 +6,192 @@
         xmlns:local="clr-namespace:DYL.EmailIntegration.Views"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="Emails DYL" Height="600" Width="800"
-        WindowStartupLocation="CenterScreen" WindowState="Maximized" MinHeight="600" MinWidth="800" >
+        Height="600" Width="800"
+        WindowStartupLocation="CenterScreen" WindowState="Normal" MinHeight="600" MinWidth="800" Style="{DynamicResource MetroWindowStyle}">
+    <Window.Resources>
+        <Style x:Key="MetroWindowStyle" TargetType="{x:Type Window}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <Grid>
+                            <Border x:Name="MainBorder" BorderThickness="0" Background="#1666AF" >
+                                <DockPanel LastChildFill="True" Background="#1666AF">
+                                    <Border x:Name="PART_TITLEBAR" 
+                                            Margin="0,0,0,0" Height="70" DockPanel.Dock="Top"  
+                                            Background="Transparent" MouseLeftButtonDown="PART_TITLEBAR_MouseLeftButtonDown">
+                                        <DockPanel LastChildFill="False">
+                                            <Image Source="../email_adapter_logo.png" Margin="30,5,0,5"></Image>
+                                            <Button x:Name="PART_CLOSE" DockPanel.Dock="Right" 
+                                                    VerticalAlignment="Center" Margin="10,5,25,5"
+                                                    Height="20" Width="20" 
+                                                    Style="{DynamicResource MetroWindowButtonStyle}"
+                                                    Click="PART_CLOSE_Click">
+                                                <Path Data="F1M54.0573,47.8776L38.1771,31.9974 54.0547,16.1198C55.7604,14.4141 55.7604,11.6511 54.0573,9.94531 52.3516,8.23962 49.5859,8.23962 47.8802,9.94531L32.0026,25.8229 16.1224,9.94531C14.4167,8.23962 11.6511,8.23962 9.94794,9.94531 8.24219,11.6511 8.24219,14.4141 9.94794,16.1198L25.8255,32 9.94794,47.8776C8.24219,49.5834 8.24219,52.3477 9.94794,54.0534 11.6511,55.7572 14.4167,55.7585 16.1224,54.0534L32.0026,38.1745 47.8802,54.0534C49.5859,55.7585 52.3516,55.7572 54.0573,54.0534 55.7604,52.3477 55.763,49.5834 54.0573,47.8776z" 
+                                                      Stretch="Uniform" Fill="White" Width="20" Margin="0" ></Path>
+                                            </Button>
+                                            <Button x:Name="PART_MAXIMIZE_RESTORE" 
+                                                    DockPanel.Dock="Right" Margin="10,5,10,5"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                    Height="20" Width="20" Style="{DynamicResource MetroWindowButtonStyle}"
+                                                    Click="PART_MAXIMIZE_RESTORE_Click">
+                                                <Path Data="M4.3685131,23.127279L4.3685131,47.283243 47.117023,47.283243 47.117023,23.127279z M0,10.684L53.755001,10.684 53.755001,51.668001 0,51.668001z M8.5679998,0L58.668022,0 64,0 64,5.6864691 64,45.317999 58.668022,45.317999 58.668022,5.6864691 8.5679998,5.6864691z"
+                                                      Stretch="Uniform" Fill="White" Width="20" Margin="0" ></Path>
+                                            </Button>
+                                            <Button x:Name="PART_MINIMIZE" 
+                                                    HorizontalAlignment="Center" 
+                                                    VerticalAlignment="Center" Margin="10,5,10,5"
+                                                    DockPanel.Dock="Right"
+                                                    Height="20" Width="20" Style="{DynamicResource MetroWindowButtonStyle}"
+                                                    Click="PART_MINIMIZE_Click" VerticalContentAlignment="Bottom">
+                                                <Button.Content>
+                                                    <Path Data="M0,20L53.333,20 53.333,8.888 0,8.888z" 
+                                                          Stretch="Uniform" Fill="White" Width="20" Margin="0,0,0,5"></Path>
+                                                </Button.Content>
+                                            </Button>
+                                        </DockPanel>
+                                    </Border>
+
+                                    <AdornerDecorator DockPanel.Dock="Bottom">
+                                        <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}"/>
+                                    </AdornerDecorator>
+                                </DockPanel>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="ResizeMode" Value="CanResizeWithGrip">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Window}">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                    <Grid>
+                                        <AdornerDecorator>
+                                            <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}"/>
+                                        </AdornerDecorator>
+                                        <ResizeGrip x:Name="WindowResizeGrip" HorizontalAlignment="Right" IsTabStop="False" Visibility="Collapsed" VerticalAlignment="Bottom"/>
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="ResizeMode" Value="CanResizeWithGrip"/>
+                                            <Condition Property="WindowState" Value="Normal"/>
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Visibility" TargetName="WindowResizeGrip" Value="Visible"/>
+                                    </MultiTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="MetroWindowButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle">
+                <Setter.Value>
+                    <Style>
+                        <Setter Property="Control.Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Rectangle Margin="2" SnapsToDevicePixels="True" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="BorderBrush" Value="#FF707070"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#FFBEE6FD"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF3C7FB1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="#FF838383"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid x:Name="MainLayout" Visibility="{Binding MainLayoutVisibility}">
+        <Grid x:Name="MainLayout" Visibility="{Binding MainLayoutVisibility}" Background="#F2F7FC">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="230"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Grid  Grid.Column="0" Margin="5,0,5,0">
+            <Grid  Grid.Column="0" Margin="40,0,40,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Emails DYL" FontSize="32" FontWeight="Bold" Foreground="#FF0A0B0E" Margin="0,10,0,20"></TextBlock>
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBlock   Text="Remaining emails: "></TextBlock>
+                <TextBlock Text="Emails" FontSize="32" FontWeight="Bold" Foreground="#1666AF" Margin="0,35,0,30"></TextBlock>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock   Text="Remaining Emails: " Foreground="#212121"></TextBlock>
                     <TextBlock Grid.Row="2" Text="{Binding RemainingEmails}" ></TextBlock>
                 </StackPanel>
                 <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <TextBlock   Text="Sent emails: "></TextBlock>
+                    <TextBlock   Text="Sent emails: " Foreground="#212121"></TextBlock>
                     <TextBlock  Text="{Binding SentEmails}" ></TextBlock>
                 </StackPanel>
-                <TextBlock  Grid.Row="4" Text="Please review and edit emails before sending." Margin="0,20,0,0" TextWrapping="Wrap"></TextBlock>
-                <CheckBox Grid.Row="5" Content="Bypass email review."  Margin="0,50,0,10" />
+                <TextBlock  Grid.Row="4" Text="Please review and edit emails before sending." Foreground="#212121" Margin="0,30,0,0" TextWrapping="Wrap"></TextBlock>
                 <StackPanel  Grid.Row="6" Visibility="{Binding EmailsListLayout}">
-                    <Button  Content="Send emails"  Command="{Binding SendEmailsCommand}" HorizontalAlignment="Left"   Margin="0,5,0,5" Width="160" ></Button>
-                    <Button  Content="Delete all emails" Command="{Binding DeleteAllCommand}" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                    <CheckBox Content="Bypass email review."  Margin="0,40,0,20" FontSize="12" Foreground="#212121"/>
+                    <Button  Content="Send All"  Command="{Binding SendEmailsCommand}"  Margin="0,0,10,10" Background="#1666AF" Foreground="White" ></Button>
+                    <Button  Content="Get Emails" Command="{Binding GetEmailsCommand}"  Margin="0,0,10,10" Background="#1666AF" Foreground="White"></Button>
+                    <Button  Content="Delete All" Command="{Binding DeleteAllCommand}"  Margin="0,0,10,10" Background="#607D8B" Foreground="White"></Button>
                 </StackPanel>
                 <StackPanel  Grid.Row="6" Visibility="{Binding EmailLayout}">
-                    <Button  Content="Send"  Command="{Binding SendCommand}" HorizontalAlignment="Left"    Margin="0,5,0,5" Width="160" ></Button>
-                    <Button  Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Left" Margin="0,5,0,5" Width="160"></Button>
+                    <Button  Content="Send"  Command="{Binding SendCommand}"  Margin="0,75,10,10" Background="#1666AF" Foreground="White"></Button>
+                    <Button  Content="Delete" Command="{Binding DeleteCommand}" Margin="0,0,10,10" Background="#607D8B" Foreground="White" ></Button>
                 </StackPanel>
+                <Button  Grid.Row="8" Content="Logout" Command="{Binding LogOutCommand}"  Margin="0,0,10,40" Background="#1666AF" Foreground="White"></Button>
 
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30" />
+                    <RowDefinition Height="40" />
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="30" />
+                    <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50"/>
                         <ColumnDefinition Width="50"/>
@@ -79,7 +213,7 @@
                     </TextBox>
                     <Button Grid.Column="7" Name="LogOut" Width="96" Content="Log Out" Command="{Binding LogOutCommand}"/>
                 </Grid>
-                <Border Grid.Row="1" BorderThickness="1" BorderBrush="DarkGray" Margin="0, 15, 0, 0">
+                <Border Grid.Row="1" BorderThickness="1" BorderBrush="DarkGray" Margin="0, 0, 20, 0">
                     <WindowsFormsHost>
                         <forms:WebBrowser x:Name="Browser"/>
                     </WindowsFormsHost>
@@ -88,30 +222,34 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock  Text="{Binding Status}"  ></TextBlock>
+                    <TextBlock  Text="{Binding Status}" FontSize="12" VerticalAlignment="Center" ></TextBlock>
                 </Grid>
             </Grid>
         </Grid>
-        <Grid  Name ="LogInLayout" HorizontalAlignment="Center" VerticalAlignment="Center"  
-               Background="LightBlue" Visibility="{Binding LogInLayoutVisibility}"  Width="282" Height="173" >
+        <Grid  Name ="LogInLayout" 
+               Background="#1666AF" Visibility="{Binding LogInLayoutVisibility}" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="43*"/>
-                <ColumnDefinition Width="69*"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="1.5*"/>
                 <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="40"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="80"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Emails DYL Login:" Grid.ColumnSpan="2" FontWeight="Bold" HorizontalAlignment="Center" Margin="61,8,55,0" FontSize="20" Width="166"/>
-            <TextBlock Text="User name or password is not valid." Grid.ColumnSpan="2" Foreground="DarkRed" HorizontalAlignment="Center" Margin="10,32,10,14" FontSize="15" Width="262" Grid.RowSpan="2" Visibility="{Binding IsLoginInvalid}"/>
-            <TextBlock Text="Name"  Grid.Row="1" Margin="6,3,3,3"/>
-            <TextBox x:Name="txtName"  Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" Margin="3,3,0,3" MinWidth="100" HorizontalAlignment="Left" Width="166"/>
-            <TextBlock Text="Password"  Grid.Row="2" Margin="6,3,3,3"/>
-            <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="2" Margin="3,3,0,3"  MinWidth="100" HorizontalAlignment="Left" Width="166"/>
-            <Button Command="{Binding LogInCommand}" CommandParameter="{Binding ElementName=txtPassword}"
-                    Content="Log in" Grid.Row="3" Grid.Column="1" Margin="3,3,5,3"/>
+            <TextBlock Text="Customer Login" Grid.Column="1" Grid.Row="1" FontSize="36" Foreground="White" Margin="0,0,0,35" HorizontalAlignment="Center"/>
+            <TextBox x:Name="txtName"  Text="{Binding UserName}" VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1"  Grid.Row="2"   Width="288"/>
+            <PasswordBox x:Name="txtPassword" Password="Password"  VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1" Grid.Row="3"   Width="288"/>
+            <TextBlock Text="User name or password is not valid." Grid.Row="4" Grid.Column="1" Foreground="Crimson"  FontSize="14" Width="288" Visibility="{Binding IsLoginInvalid}"/>
+
+            <Button Command="{Binding LogInCommand}" CommandParameter="{Binding ElementName=txtPassword}" Background="#30395C" Foreground="White"
+                    Content="Login" FontSize="24"  Grid.Row="5" Grid.Column="1" Height="44" Width="288"/>
         </Grid>
     </Grid>
 </Window>

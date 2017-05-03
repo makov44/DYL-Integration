@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Models;
+using DYL.EmailIntegration.UI.Properties;
 using log4net;
 
 namespace DYL.EmailIntegration.Helpers
@@ -113,6 +115,33 @@ namespace DYL.EmailIntegration.Helpers
             };
             Task.Run(async () => 
                  await HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest));
+        }
+
+        private static ChannelFactory<ILoginContract> CreateChannelFactory()
+        {
+            var address = Settings.Default.WcfNetPipeUrl;
+            var binding = new NetNamedPipeBinding(NetNamedPipeSecurityMode.Transport);
+            var ep = new EndpointAddress(address);
+            var factory = new ChannelFactory<ILoginContract>(binding, ep);
+            return factory;
+        }
+
+        public static void AutoLoginNotificationService(Credentials credentials)
+        {
+            var factory = CreateChannelFactory();
+            try
+            {
+                var channel = factory.CreateChannel();
+                var isSuccess = channel.Login(credentials.email, credentials.password);
+                if(!isSuccess) 
+                    Log.Error("Faled to auto login to Notification service.");
+                factory.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                factory.Abort();
+            }
         }
     }
 }

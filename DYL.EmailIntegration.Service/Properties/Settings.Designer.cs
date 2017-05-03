@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DYL.EmailIntegration.UI.Properties {
+namespace DYL.EmailIntegration.Service.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,15 +25,6 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
-        public int ServiceInterval {
-            get {
-                return ((int)(this["ServiceInterval"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("http://dyl-ph.getdyl.com")]
         public string BaseUrl {
             get {
@@ -43,19 +34,10 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://webmail.hostallapps.com/owa/")]
-        public string AllStatesGatewayUrl {
+        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
+        public int NotificationInterval {
             get {
-                return ((string)(this["AllStatesGatewayUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://webmail.hostallapps.com/owa/")]
-        public string AllStatesOutlookUrl {
-            get {
-                return ((string)(this["AllStatesOutlookUrl"]));
+                return ((int)(this["NotificationInterval"]));
             }
         }
         

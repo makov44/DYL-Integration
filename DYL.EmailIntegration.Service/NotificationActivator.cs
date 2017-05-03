@@ -21,6 +21,7 @@ namespace DYL.EmailIntegration.Service
 
         public static void Initialize()
         {
+            Log.Info("NotificationActivator was initialized.");
             regService = new RegistrationServices();
 
             cookie = regService.RegisterTypeForComClients(
