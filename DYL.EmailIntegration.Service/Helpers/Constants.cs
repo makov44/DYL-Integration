@@ -11,5 +11,6 @@ namespace DYL.EmailIntegration.Service.Helpers
         public const string GetEmailsTotalUrl = "api/sequence/emails?count_only=1";
         public const string LoginUrl = "/api/sequence/login";
         public const string LogoutUrl = "/api/sequence/logout";
+        public const string TokenFileName = "token_service.txt";
     }
 }

@@ -418,7 +418,7 @@ namespace DYL.EmailIntegration.ViewModels
                 if (string.IsNullOrEmpty(key))
                     return;
 
-                Authentication.SaveCredentials(credentials);
+                Authentication.SaveCredentials(credentials, Constants.TokenFileName);
                 ApplicationService.AutoLoginNotificationService(credentials);
             });
 

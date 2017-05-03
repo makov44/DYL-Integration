@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication.cs" />
     <Compile Include="Contracts\BaseHttpResponse.cs" />
     <Compile Include="Contracts\CredentialsHttpRequest.cs" />
     <Compile Include="Contracts\ILoginContract.cs" />

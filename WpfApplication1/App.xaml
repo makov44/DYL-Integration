@@ -5,14 +5,12 @@
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <Style TargetType="Button">
-            <Setter Property="FontSize" Value="14"></Setter>
             <Setter Property="Height" Value="34"></Setter>
             <Setter Property="FontWeight" Value="Bold"></Setter>
             <Setter Property="FontFamily" Value="Arial"></Setter>
             <Setter Property="FontStyle" Value="Normal"></Setter>
         </Style>
         <Style TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"></Setter>
             <Setter Property="FontFamily" Value="Arial"></Setter>
             <Setter Property="FontStyle" Value="Normal"></Setter>
         </Style>

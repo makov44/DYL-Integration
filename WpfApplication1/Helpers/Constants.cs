@@ -8,7 +8,7 @@ namespace DYL.EmailIntegration.Helpers
 {
     public struct Constants
     {
-        public const string LoginFileName = "token.txt";
+        public const string TokenFileName = "token.txt";
         public const string GetEmailsUrl = "/api/sequence/emails";
         public const string LoginUrl = "/api/sequence/login";
         public const string StatusUrl = "/api/sequence/status";

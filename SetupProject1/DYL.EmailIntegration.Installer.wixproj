@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>1e934a49-3dc2-422f-9b51-099045303d5b</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>DYL.EmailIntegration.Installer</OutputName>
+    <OutputName>DYLEmailAdapter</OutputName>
     <OutputType>Package</OutputType>
     <Name>DYL.EmailIntegration.Installer</Name>
   </PropertyGroup>

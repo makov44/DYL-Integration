@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="DF5C828B-3442-4FE6-9495-A134A8374043" Name="DYL.EmailIntegration" Language="1033" Version="1.0.0.1" Manufacturer="DYL" 
+	<Product Id="DF5C828B-3442-4FE6-9495-A134A8374043" Name="DYL Email Adapter" Language="1033" Version="1.0.0.1" Manufacturer="DYL" 
            UpgradeCode="699C2727-72C3-4C51-836E-6648D5D8F725">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
@@ -66,7 +66,7 @@
       </Component>
       <!-- This creates a start menu shortcut -->
       <Component Id="ApplicationShortcut" Guid="{E49F92FF-D941-4745-ABD8-D2702B9BFD13}" Directory="DYL.Shotcuts">
-        <Shortcut Id="ApplicationStartMenuShortcut" Name="Emails DYL" Description="Sends DYL emails using Outlook Web" Target="[INSTALLFOLDERUI]DYL.EmailIntegration.UI.exe" WorkingDirectory="INSTALLFOLDERUI">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="DYL Email Adapter" Description="Sends DYL emails using Outlook Web" Target="[INSTALLFOLDERUI]DYL.EmailIntegration.UI.exe" WorkingDirectory="INSTALLFOLDERUI">
           <!-- Set the AppID in order to get toast notifications to work -->
           <ShortcutProperty Key="System.AppUserModel.ID" Value="DYL.NotificationService"></ShortcutProperty>
           <!-- Set the ToastActivatorCLSID in order to get notifications working in Action Center -->

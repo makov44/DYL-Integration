@@ -34,6 +34,17 @@ namespace DYL.EmailIntegration.Domain
             Log.Info($"{_name} timer started.");
         }
 
+        public void StartTask(Func<Task> action)
+        {
+            if (_timer.Interval <= 0)
+                return;
+            _timer.Elapsed += async (obj, e) => await action().ConfigureAwait(false);
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
+            _timer.Start();
+            Log.Info($"{_name} timer started.");
+        }
+
         public void Stop()
         {
             _timer.Enabled = false;

@@ -57,7 +57,7 @@ namespace DYL.EmailIntegration.Helpers
 
         public static void AutoLogin()
         {
-            var credentials = Authentication.LoadCredentials();
+            var credentials = Authentication.LoadCredentials(Constants.TokenFileName);
             if (credentials != null)
             {
                 GetNewSessionKey(credentials, key =>
@@ -90,7 +90,7 @@ namespace DYL.EmailIntegration.Helpers
         public static void SessionTimerEventHandler()
         {
             Log.Info("Session timer elapsed event raised.");
-            var credentials = Authentication.LoadCredentials();
+            var credentials = Authentication.LoadCredentials(Constants.TokenFileName);
             if (credentials == null)
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() => { Context.Session = null; });
@@ -114,7 +114,7 @@ namespace DYL.EmailIntegration.Helpers
                 session_key = Context.Session.Key
             };
             Task.Run(async () => 
-                 await HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest));
+                 await HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest)).ConfigureAwait(false);
         }
 
         private static ChannelFactory<ILoginContract> CreateChannelFactory()
@@ -133,8 +133,10 @@ namespace DYL.EmailIntegration.Helpers
             {
                 var channel = factory.CreateChannel();
                 var isSuccess = channel.Login(credentials.email, credentials.password);
+
                 if(!isSuccess) 
-                    Log.Error("Faled to auto login to Notification service.");
+                    Log.Error("Faled to call auto login service. (Notification Service)");
+                
                 factory.Close();
             }
             catch (Exception ex)

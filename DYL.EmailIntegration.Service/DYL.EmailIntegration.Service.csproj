@@ -69,6 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationService.cs" />
+    <Compile Include="Data\Context.cs" />
+    <Compile Include="Data\Session.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="IpcService\LoginServer.cs" />
     <Compile Include="NotificationActivator.cs" />

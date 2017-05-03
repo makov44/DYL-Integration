@@ -35,7 +35,7 @@ namespace DYL.EmailIntegration.Domain
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        Log.Error($"Failed to login, statusCode:{response.StatusCode}, " +
+                        Log.Error($"Failed to get new session key, statusCode:{response.StatusCode}, " +
                                   $"reason:{response.ReasonPhrase}, message:{result?.message}");
                         return string.Empty;
                     }
@@ -83,9 +83,9 @@ namespace DYL.EmailIntegration.Domain
         {
             try
             {
-                using (var response = await Client.PostAsJsonAsync(requestUrl, status))
+                using (var response = await Client.PostAsJsonAsync(requestUrl, status).ConfigureAwait(false))
                 {
-                    var result = await response.Content.ReadAsAsync<BaseHttpResponse>();
+                    var result = await response.Content.ReadAsAsync<BaseHttpResponse>().ConfigureAwait(false);
 
                     if (!response.IsSuccessStatusCode)
                     {
