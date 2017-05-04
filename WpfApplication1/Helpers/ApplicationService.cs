@@ -144,5 +144,25 @@ namespace DYL.EmailIntegration.Helpers
                 factory.Abort();
             }
         }
+
+        public static void LogoutNotificationService()
+        {
+            var factory = CreateChannelFactory();
+            try
+            {
+                var channel = factory.CreateChannel();
+                var isSuccess = channel.Logout();
+
+                if (!isSuccess)
+                    Log.Error("Faled to call logout service. (Notification Service)");
+
+                factory.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                factory.Abort();
+            }
+        }
     }
 }

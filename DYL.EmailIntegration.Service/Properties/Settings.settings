@@ -12,7 +12,7 @@
       <Value Profile="(Default)">net.pipe://localhost/dyl/Login</Value>
     </Setting>
     <Setting Name="SessionExpirationInterval" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">45000</Value>
+      <Value Profile="(Default)">3600000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -428,6 +428,8 @@ namespace DYL.EmailIntegration.ViewModels
         {
             LogInLayoutVisibility = Visibility.Visible;
             MainLayoutVisibility = Visibility.Collapsed;
+            Authentication.CleanupCredentials(Constants.TokenFileName);
+            ApplicationService.LogoutNotificationService();
         }
 
         #endregion

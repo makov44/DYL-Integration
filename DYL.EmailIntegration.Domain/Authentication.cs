@@ -64,5 +64,17 @@ namespace DYL.EmailIntegration.Domain
                 Log.Error("Failed to save credentials.", ex);
             }
         }
+
+        public static void CleanupCredentials(string filename)
+        {
+            try
+            {
+                IsolatedStorageService.Write(filename, new byte[0]);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed to clean up credentials.", ex);
+            }
+        }
     }
 }

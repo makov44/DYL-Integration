@@ -52,7 +52,7 @@ namespace DYL.EmailIntegration.Service.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("45000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3600000")]
         public int SessionExpirationInterval {
             get {
                 return ((int)(this["SessionExpirationInterval"]));

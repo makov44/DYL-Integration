@@ -38,7 +38,15 @@ namespace DYL.EmailIntegration.Service.IpcService
                 }
                 Authentication.SaveCredentials(credentials, Constants.TokenFileName);
             });
-          
+            Log.Info("Login to Notification service.");
+            return true;
+        }
+
+        public bool Logout()
+        {
+            Context.Session = null;
+            Authentication.CleanupCredentials(Constants.TokenFileName);
+            Log.Info("Notification service was logout.");
             return true;
         }
     }

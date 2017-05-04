@@ -12,5 +12,8 @@ namespace DYL.EmailIntegration.Domain.Contracts
     {
         [OperationContract]
         bool Login(string username, string password);
+
+        [OperationContract]
+        bool Logout();
     }
 }
