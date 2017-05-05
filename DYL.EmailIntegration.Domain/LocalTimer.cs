@@ -27,7 +27,7 @@ namespace DYL.EmailIntegration.Domain
         {
             if(_timer.Interval <= 0)
                 return;
-            _timer.Elapsed += async (obj, e) => await Task.Factory.StartNew(action);
+            _timer.Elapsed += (obj, e) => Task.Factory.StartNew(action);
             _timer.AutoReset = true;
             _timer.Enabled = true;
             _timer.Start();
@@ -38,7 +38,7 @@ namespace DYL.EmailIntegration.Domain
         {
             if (_timer.Interval <= 0)
                 return;
-            _timer.Elapsed += async (obj, e) => await action().ConfigureAwait(false);
+            _timer.Elapsed +=  (obj, e) => action();
             _timer.AutoReset = true;
             _timer.Enabled = true;
             _timer.Start();

@@ -112,8 +112,8 @@ namespace DYL.EmailIntegration.Helpers
                 status = status.StatusName,
                 session_key = Context.Session.Key
             };
-            Task.Run(async () => 
-                 await HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest)).ConfigureAwait(false);
+            Task.Run(() => 
+                  HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest));
         }
 
         private static ChannelFactory<ILoginContract> CreateChannelFactory()
