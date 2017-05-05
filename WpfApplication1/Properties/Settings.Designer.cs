@@ -88,7 +88,7 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public int DelayAutoSendingEmails {
             get {
                 return ((int)(this["DelayAutoSendingEmails"]));

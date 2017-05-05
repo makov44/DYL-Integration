@@ -485,9 +485,9 @@ namespace DYL.EmailIntegration.ViewModels
 
             Task.Run(() =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(async () =>
                 {
-                    Task.Delay(Settings.Default.DelayAutoSendingEmails);
+                    await Task.Delay(Settings.Default.DelayAutoSendingEmails);
                     Send_OnClick();
                 });
             });
@@ -571,9 +571,9 @@ namespace DYL.EmailIntegration.ViewModels
             {
                 Task.Run(()=>
                 {
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    System.Windows.Application.Current.Dispatcher.Invoke(async () =>
                     {
-                        Task.Delay(1000);
+                        await Task.Delay(1000);
                         SendAll_OnClick();
                     });
                 });
