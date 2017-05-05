@@ -134,7 +134,7 @@ namespace DYL.EmailIntegration.Service
 
 
                 // Specify the absolute path to an image as a URI
-                string imagePath = Path.GetFullPath("email_adapter_logo.png");
+                string imagePath = "file:///" + Path.GetFullPath("email_adapter_logo.png");
                 XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
                 imageElements[0].Attributes.GetNamedItem("src").NodeValue = imagePath;
 

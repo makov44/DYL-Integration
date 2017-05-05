@@ -98,7 +98,7 @@
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate>
-                                    <Rectangle Margin="2" SnapsToDevicePixels="True" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                                    <Rectangle Margin="0" SnapsToDevicePixels="True" />
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -116,7 +116,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
                         <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" 
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsDefaulted" Value="True">
@@ -173,8 +175,8 @@
                 </StackPanel>
                 <TextBlock  Grid.Row="4" Text="Please review and edit emails before sending." FontSize="14" Foreground="#212121" Margin="0,30,0,0" TextWrapping="Wrap"></TextBlock>
                 <StackPanel  Grid.Row="6" Visibility="{Binding EmailsListLayout}">
-                    <CheckBox Content="Bypass email review."  Margin="0,40,0,20" FontSize="12" Foreground="#212121"/>
-                    <Button  Content="Send All"  Command="{Binding SendEmailsCommand}" FontSize="14" Margin="0,0,10,10" Background="#1666AF" Foreground="White" ></Button>
+                    <CheckBox Content="Bypass email review."  Margin="0,40,0,20" FontSize="12" Foreground="#212121" IsChecked="{Binding IsBypassReview}"  />
+                    <Button  Content="Send All"  Command="{Binding SendAllCommand}" FontSize="14" Margin="0,0,10,10" Background="#1666AF" Foreground="White" ></Button>
                     <Button  Content="Get Emails" Command="{Binding GetEmailsCommand}" FontSize="14" Margin="0,0,10,10" Background="#1666AF" Foreground="White"></Button>
                     <Button  Content="Delete All" Command="{Binding DeleteAllCommand}" FontSize="14" Margin="0,0,10,10" Background="#607D8B" Foreground="White"></Button>
                 </StackPanel>
@@ -244,8 +246,8 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Text="Customer Login" Grid.Column="1" Grid.Row="1" FontSize="36" Foreground="White" Margin="0,0,0,35" HorizontalAlignment="Center"/>
-            <TextBox x:Name="txtName"  Text="{Binding UserName}" VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1"  Grid.Row="2"   Width="288"/>
-            <PasswordBox x:Name="txtPassword" Password="Password"  VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1" Grid.Row="3"   Width="288"/>
+            <TextBox x:Name="txtName"  Text="{Binding UserName}" Padding="14,0,0,0" VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1"  Grid.Row="2"   Width="288"/>
+            <PasswordBox x:Name="txtPassword" Password="Password" Padding="14,0,0,0"  VerticalContentAlignment="Center" Margin="0,0,0,15" Grid.Column="1" Grid.Row="3"   Width="288"/>
             <TextBlock Text="User name or password is not valid." Grid.Row="4" Grid.Column="1" Foreground="Crimson"  FontSize="14" Width="288" Visibility="{Binding IsLoginInvalid}"/>
 
             <Button Command="{Binding LogInCommand}" CommandParameter="{Binding ElementName=txtPassword}" Background="#30395C" Foreground="White"

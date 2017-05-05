@@ -31,7 +31,7 @@ namespace DYL.EmailIntegration.ViewModels
         public ICommand LogOutCommand => new DelegateCommand(param => { LogOut_OnClick(); });
         public ICommand BackCommand => new DelegateCommand(param => { Back_OnClick();});
         public ICommand ForwardCommand => new DelegateCommand(param => { Forward_OnClick();});
-        public ICommand SendEmailsCommand => new DelegateCommand(param=> { SendEmails_OnClick(); });
+        public ICommand SendAllCommand => new DelegateCommand(param=> { SendAll_OnClick(); });
         public ICommand SendCommand => new DelegateCommand(param => { Send_OnClick(); });
         public ICommand GetEmailsCommand => new DelegateCommand(param => { GetEmails_OnClick(); });
         public ICommand DeleteCommand => new DelegateCommand(param => { Delete_OnClick(); });
@@ -48,6 +48,20 @@ namespace DYL.EmailIntegration.ViewModels
         private readonly string _outlookHomePage = Settings.Default.AllStatesOutlookUrl;
         private PageName _currentPage;
         private readonly ConcurrentQueue<Email> _currentEmailQueue = new ConcurrentQueue<Email>();
+
+        private bool _isBypassReview;
+        public bool IsBypassReview
+        {
+            get { return _isBypassReview; }
+            set
+            {
+                if (_isBypassReview == value)
+                    return;
+                _isBypassReview = value;
+                RaisePropertyChangedEvent("IsBypassReview");
+            }
+        }
+
         private int _remainingEmails;
         public int RemainingEmails
         {
@@ -275,7 +289,7 @@ namespace DYL.EmailIntegration.ViewModels
                 _currentPage = PageName.Home;
                 _browser.Navigate(_outlookHomePage);
                 SentEmails++;
-               PostEmailStatus("sent");
+                PostEmailStatus("sent");
             }
             catch (Exception ex)
             {
@@ -283,10 +297,16 @@ namespace DYL.EmailIntegration.ViewModels
                 PostEmailStatus("failed");
             }
         }
-
         private void GetEmails_OnClick()
         {
-           
+            if (Context.EmailQueue.Count > Settings.Default.MaxSizeEmailsQueue)
+            {
+               MessageBox.Show($"Email Queue exceeded the limit of {Settings.Default.MaxSizeEmailsQueue} items.",
+                   "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            ApplicationService.GetEmails(Context.Session.Key);
         }
 
         private void PostEmailStatus(string status)
@@ -375,7 +395,7 @@ namespace DYL.EmailIntegration.ViewModels
             _browser.GoForward();
         }
 
-        private void SendEmails_OnClick()
+        private void SendAll_OnClick()
         {
             if (Context.EmailQueue.Count <= 0)
             {
@@ -458,12 +478,29 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void NewEmailHandler()
         {
+            PopulateNewEmailForm();
+
+            if (!IsBypassReview)
+                return;
+
+            Task.Run(() =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Task.Delay(Settings.Default.DelayAutoSendingEmails);
+                    Send_OnClick();
+                });
+            });
+        }
+
+        private void PopulateNewEmailForm()
+        {
             ShowEmailPage(true);
             Email email;
             Context.EmailQueue.TryDequeue(out email);
             if (email == null)
             {
-               Log.Error("Can't retrieve email from the queue.");
+                Log.Error("Can't retrieve email from the queue.");
                 return;
             }
 
@@ -498,7 +535,7 @@ namespace DYL.EmailIntegration.ViewModels
 
             var head = _document?.GetElementsByTagName("head")[0];
             var scriptEl = _document?.CreateElement("script");
-            var element = (IHTMLScriptElement)scriptEl?.DomElement;
+            var element = (IHTMLScriptElement) scriptEl?.DomElement;
 
             if (scriptEl == null || element == null)
                 return;
@@ -537,7 +574,7 @@ namespace DYL.EmailIntegration.ViewModels
                     System.Windows.Application.Current.Dispatcher.Invoke(() =>
                     {
                         Task.Delay(1000);
-                        SendEmails_OnClick();
+                        SendAll_OnClick();
                     });
                 });
             }

@@ -20,7 +20,7 @@ namespace DYL.EmailIntegration.Helpers
         {
             if (Context.EmailQueue.Count > Settings.Default.MaxSizeEmailsQueue)
             {
-                Log.Error("Email Queue has reached the limit of 200 items.");
+                Log.Error($"Email Queue has reached the limit of {Settings.Default.MaxSizeEmailsQueue} items.");
                 return;
             }
                
