@@ -24,15 +24,17 @@ namespace DYL.EmailIntegration.Service
     public partial class NotificationService : ServiceBase
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly LocalTimer _emailsTimer;
-        private readonly LocalTimer _sessionTimer;
-        private readonly ServiceHost _serviceHost;
+        private LocalTimer _emailsTimer;
+        private LocalTimer _sessionTimer;
+        private ServiceHost _serviceHost;
         public NotificationService()
         {
-            _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval, "Notification");
-            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
-            _serviceHost = ApplicationService.CreateNetPipeHost();
             InitializeComponent();
+        }
+
+        private void Context_ResetTimer(object sender, EventArgs e)
+        {
+            _emailsTimer.Reset();
         }
 
         protected override void OnStart(string[] args)
@@ -43,7 +45,13 @@ namespace DYL.EmailIntegration.Service
                 Log.Error("Settings property 'BaseUrl' in config file is empty.");
                 return;
             }
+
+            _serviceHost = ApplicationService.CreateNetPipeHost();
+            _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval, "Notification");
+            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
             HttpService.CreateService(Settings.Default.BaseUrl);
+            Context.ResetTimer += Context_ResetTimer;
+
             NotificationActivator.Initialize();
             try
             {
@@ -59,14 +67,17 @@ namespace DYL.EmailIntegration.Service
             _sessionTimer.StartTask(ApplicationService.RenewSession);
         }
 
-       
-
         protected override void OnStop()
         {
+            _emailsTimer?.Stop();
+            _sessionTimer?.Stop();
+            Context.ResetTimer -= Context_ResetTimer;
             NotificationActivator.Uninitialize();
+            _emailsTimer?.Dispose();
+            _sessionTimer?.Dispose();
             _serviceHost?.Close();
-            _emailsTimer.Stop();
-            Log.Info("Notification service Exited");
+            
+            Log.Info("Notification Service Stoped");
         }
     }
 }

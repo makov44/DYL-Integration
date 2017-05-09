@@ -14,7 +14,7 @@ using log4net;
 namespace DYL.EmailIntegration.Service.IpcService
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class LoginServer : ILoginContract
+    public class NetPipeService : ILoginContract, ISyncTimerContract
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public bool Login(string username, string password)
@@ -48,6 +48,10 @@ namespace DYL.EmailIntegration.Service.IpcService
             Authentication.CleanupCredentials(Constants.TokenFileName);
             Log.Info("Notification service was logout.");
             return true;
+        }
+        public void Notify()
+        {
+            Context.RaiseResetTimerEvent();
         }
     }
 }

@@ -116,6 +116,7 @@ namespace DYL.EmailIntegration
             Context.EmailQueue = new ObservableConcurrentQueue<Email>();
             HttpService.CreateService(Settings.Default.BaseUrl);
             ApplicationService.AutoLogin();
+            ApplicationService.SyncTimerService();
             _emailsTimer.Start(ApplicationService.EmailTimerEventHandler);
             _sessionTimer.Start(ApplicationService.RenewSession);
             base.OnStartup(e);
@@ -128,6 +129,8 @@ namespace DYL.EmailIntegration
         {
             _emailsTimer?.Stop();
             _sessionTimer?.Stop();
+            _emailsTimer?.Dispose();
+            _sessionTimer?.Dispose();
             Log?.Info("Application Exited");
             base.OnExit(e);
         }

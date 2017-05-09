@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using log4net;
 using log4net.Config;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DYL.EmailIntegration.Domain
 {
@@ -58,7 +61,26 @@ namespace DYL.EmailIntegration.Domain
             {
                 using (var response = await Client.PostAsJsonAsync(requestUrl, sessionkey))
                 {
-                    var result = await response.Content.ReadAsAsync<EmailsHttpResponse>();
+                    var formatter = new JsonMediaTypeFormatter
+                    {
+                        SerializerSettings = new JsonSerializerSettings
+                        {
+                            Formatting = Newtonsoft.Json.Formatting.None,
+                            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                            StringEscapeHandling = StringEscapeHandling.EscapeNonAscii,
+                            MissingMemberHandling = MissingMemberHandling.Ignore,
+                            Error = (sender, args) =>
+                            {
+                                args.ErrorContext.Handled = true;
+                                Log.Error($"Error: {args.ErrorContext.Error} \r\n Member: {args.ErrorContext.Member}, " +
+                                          $"Original Object: {args.ErrorContext.OriginalObject}, Path: {args.ErrorContext.Path} , Source: {sender}");
+                            }
+                        },
+                    };
+
+                    formatter.SupportedEncodings.Add(Encoding.GetEncoding("iso-8859-1"));
+                    var result = await response.Content.ReadAsAsync<EmailsHttpResponse>(new[] { formatter});
 
                     if (!response.IsSuccessStatusCode)
                     {

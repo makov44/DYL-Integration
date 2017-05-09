@@ -33,7 +33,7 @@ namespace DYL.EmailIntegration.Helpers
                         session_key = key
                     };
                     var response = await HttpService.GetEmails(Constants.GetEmailsUrl, session);
-                    if (response == null || response.Total == 0 || response.Data == null)
+                    if (response == null || response.Count == 0 || response.Data == null)
                         return;
                     response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
                 }
@@ -116,18 +116,18 @@ namespace DYL.EmailIntegration.Helpers
                   HttpService.PostStatus(Constants.StatusUrl, statusHttpRequest));
         }
 
-        private static ChannelFactory<ILoginContract> CreateChannelFactory()
+        private static ChannelFactory<T> CreateChannelFactory<T>()
         {
-            var address = Settings.Default.WcfNetPipeUrl;
+            var fullAddress = Settings.Default.WcfNetPipeUrl;
             var binding = new NetNamedPipeBinding(NetNamedPipeSecurityMode.Transport);
-            var ep = new EndpointAddress(address);
-            var factory = new ChannelFactory<ILoginContract>(binding, ep);
+            var ep = new EndpointAddress(fullAddress);
+            var factory = new ChannelFactory<T>(binding, ep);
             return factory;
         }
 
         public static void AutoLoginNotificationService(Credentials credentials)
         {
-            var factory = CreateChannelFactory();
+            var factory = CreateChannelFactory<ILoginContract>();
             try
             {
                 var channel = factory.CreateChannel();
@@ -145,9 +145,25 @@ namespace DYL.EmailIntegration.Helpers
             }
         }
 
+        public static void SyncTimerService()
+        {
+            var factory = CreateChannelFactory<ISyncTimerContract>();
+            try
+            {
+                var channel = factory.CreateChannel();
+                channel.Notify();
+                factory.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                factory.Abort();
+            }
+        }
+
         public static void LogoutNotificationService()
         {
-            var factory = CreateChannelFactory();
+            var factory = CreateChannelFactory<ILoginContract>();
             try
             {
                 var channel = factory.CreateChannel();

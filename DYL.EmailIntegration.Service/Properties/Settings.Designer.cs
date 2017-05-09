@@ -43,7 +43,7 @@ namespace DYL.EmailIntegration.Service.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("net.pipe://localhost/dyl/Login")]
+        [global::System.Configuration.DefaultSettingValueAttribute("net.pipe://localhost/dyl/")]
         public string WcfNetPipeUrl {
             get {
                 return ((string)(this["WcfNetPipeUrl"]));

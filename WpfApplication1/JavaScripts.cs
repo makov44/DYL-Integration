@@ -30,7 +30,11 @@
         intervalHandler();
     })();";
 
-        public static string ReplaceIFrameContent = @"
+        public static string ReplaceIFrameContent;
+
+        static JavaScripts()
+        {
+            ReplaceIFrameContent = @"
 var replaceIFrameContent = function () {
     var handler = function () {                 
             var iframe = document.getElementById('ifBdy');
@@ -55,5 +59,6 @@ var replaceIFrameContent = function () {
     }
     var interval = setInterval(handler, 200);
 };";
+        }
     }
 }

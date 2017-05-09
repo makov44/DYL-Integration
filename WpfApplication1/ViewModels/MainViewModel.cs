@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -35,6 +36,7 @@ namespace DYL.EmailIntegration.ViewModels
         public ICommand SendCommand => new DelegateCommand(param => { Send_OnClick(); });
         public ICommand GetEmailsCommand => new DelegateCommand(param => { GetEmails_OnClick(); });
         public ICommand DeleteCommand => new DelegateCommand(param => { Delete_OnClick(); });
+        public ICommand CancelCommand => new DelegateCommand(param => { Cancel_OnClick(); });
         public ICommand DeleteAllCommand => new DelegateCommand(param => { DeleteAll_OnClick(); });
         public ICommand RefreshCommand => new DelegateCommand(param => { Refresh_OnClick(); });
         public ICommand EnterCommand => new DelegateCommand(param => { TbUrl_OnKeyDown(param?.ToString()); }); 
@@ -48,7 +50,7 @@ namespace DYL.EmailIntegration.ViewModels
         private readonly string _outlookHomePage = Settings.Default.AllStatesOutlookUrl;
         private PageName _currentPage;
         private readonly ConcurrentQueue<Email> _currentEmailQueue = new ConcurrentQueue<Email>();
-
+        private bool _isCanceled;
         private bool _isBypassReview;
         public bool IsBypassReview
         {
@@ -247,6 +249,7 @@ namespace DYL.EmailIntegration.ViewModels
                 HomeEmailHandler();
 
             _currentPage = PageName.None;
+            _isCanceled = false;
         }
 
         private void MainWindow_NewWindow(ref object ppDisp, ref bool Cancel, uint dwFlags, string bstrUrlContext,
@@ -322,6 +325,20 @@ namespace DYL.EmailIntegration.ViewModels
                 EmailId = email.Id,
                 StatusName = status
             });
+        }
+
+        private void Cancel_OnClick()
+        {
+            _isCanceled = true;
+            _currentPage = PageName.Home;
+            _browser.Navigate(_outlookHomePage);
+            Email email;
+            _currentEmailQueue.TryDequeue(out email);
+
+            if (email == null)
+                return;
+
+            Context.EmailQueue.Enqueue(email);
         }
 
         private void Delete_OnClick()
@@ -480,7 +497,7 @@ namespace DYL.EmailIntegration.ViewModels
         {
             PopulateNewEmailForm();
 
-            if (!IsBypassReview)
+            if (!IsBypassReview || _isCanceled)
                 return;
 
             Task.Run(() =>
@@ -539,8 +556,8 @@ namespace DYL.EmailIntegration.ViewModels
 
             if (scriptEl == null || element == null)
                 return;
-
-            element.text = JavaScripts.ReplaceIFrameContent.Replace("=eewwfdfadsdffgnvbnbvhkiussdavcvbgfhyt=", email.Body);
+            var bodyEncoded =HttpUtility.JavaScriptStringEncode(email.Body.Replace("\n", "<br/>"));
+            element.text = JavaScripts.ReplaceIFrameContent.Replace("=eewwfdfadsdffgnvbnbvhkiussdavcvbgfhyt=", bodyEncoded);
             scriptEl.Id = scriptId;
             head?.AppendChild(scriptEl);
 
@@ -566,7 +583,12 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void HomeEmailHandler()
         {
-            
+            if (_isCanceled)
+            {
+                ShowEmailPage(false);
+                return;
+            }
+
             if (Context.EmailQueue.Count > 0)
             {
                 Task.Run(()=>

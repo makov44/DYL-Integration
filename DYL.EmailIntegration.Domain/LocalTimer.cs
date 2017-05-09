@@ -49,8 +49,18 @@ namespace DYL.EmailIntegration.Domain
         {
             _timer.Enabled = false;
             _timer.Stop();
-            _timer.Dispose();
             Log.Info($"{_name} timer stoped.");
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
+        }
+
+        public void Reset()
+        {
+            _timer.Stop();
+            _timer.Start();
         }
     }
 }

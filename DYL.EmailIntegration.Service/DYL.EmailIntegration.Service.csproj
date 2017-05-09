@@ -72,7 +72,7 @@
     <Compile Include="Data\Context.cs" />
     <Compile Include="Data\Session.cs" />
     <Compile Include="Helpers\Constants.cs" />
-    <Compile Include="IpcService\LoginServer.cs" />
+    <Compile Include="IpcService\NetPipeService.cs" />
     <Compile Include="NotificationActivator.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -98,7 +98,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

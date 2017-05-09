@@ -15,7 +15,7 @@
       <Value Profile="(Default)">https://webmail.hostallapps.com/owa/</Value>
     </Setting>
     <Setting Name="WcfNetPipeUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">net.pipe://localhost/dyl/Login</Value>
+      <Value Profile="(Default)">net.pipe://localhost/dyl/</Value>
     </Setting>
     <Setting Name="SessionExpirationInterval" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">3600000</Value>

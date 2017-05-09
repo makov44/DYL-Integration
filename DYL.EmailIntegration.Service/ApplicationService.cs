@@ -28,9 +28,10 @@ namespace DYL.EmailIntegration.Service
             var address = Settings.Default.WcfNetPipeUrl;
             try
             {
-                var serviceHost = new ServiceHost(typeof(LoginServer));
+                var serviceHost = new ServiceHost(typeof(NetPipeService));
                 var binding = new NetNamedPipeBinding(NetNamedPipeSecurityMode.Transport);
-                serviceHost.AddServiceEndpoint(typeof(ILoginContract), binding, address);
+                serviceHost.AddServiceEndpoint(typeof(ILoginContract), binding, address );
+                serviceHost.AddServiceEndpoint(typeof(ISyncTimerContract), binding, address);
 
                 Log.Info($"WCF ServiceHost started. Address:{address}");
 
