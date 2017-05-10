@@ -238,9 +238,9 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void BrowserOnDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs webBrowserDocumentCompletedEventArgs)
         {
-            Log.Debug($"Called BrowserOnDocumentCompleted document Url = {_browser.Document?.Url}");
+            Log.Debug($"Called BrowserOnDocumentCompleted document Url = {_browser.Document?.Url}, Current Page: {_currentPage}");
             _document = _browser.Document;
-            if (_document != null && _document.Window != null)
+            if (_document?.Window != null)
                 _document.Window.Error += Window_Error;
             DisableAlertWindow();
             if(_currentPage == PageName.New)
@@ -473,28 +473,36 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void DisableAlertWindow()
         {
-            var scriptId = "PopupWindowsBlocker";
-            var script = _document?.GetElementById(scriptId);
+            try
+            {
+                var scriptId = "PopupWindowsBlocker";
+                var script = _document?.GetElementById(scriptId);
 
-            if (script != null)
-                return;
+                if (script != null)
+                    return;
 
-            HtmlElement head = _document?.GetElementsByTagName("head")[0];
-            HtmlElement scriptEl = _document?.CreateElement("script");
-            IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
-            if (scriptEl == null)
-                return;
+                var head = _document?.GetElementsByTagName("head")[0];
+                var scriptEl = _document?.CreateElement("script");
+                IHTMLScriptElement element = (IHTMLScriptElement)scriptEl?.DomElement;
+                if (scriptEl == null)
+                    return;
 
-            scriptEl.Id = scriptId;
+                scriptEl.Id = scriptId;
 
-            if (element != null)
-                element.text = JavaScripts.AlertBlocker + " " + JavaScripts.OnbeforeunloadBlocker;
+                if (element != null)
+                    element.text = JavaScripts.AlertBlocker + " " + JavaScripts.OnbeforeunloadBlocker;
 
-            head?.AppendChild(scriptEl);
+                head?.AppendChild(scriptEl);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed to disable alert window.", ex);
+            }
         }
 
         private void NewEmailHandler()
         {
+            Log.Debug("Called NewEmailHandler");
             PopulateNewEmailForm();
 
             if (!IsBypassReview || _isCanceled)
@@ -583,6 +591,7 @@ namespace DYL.EmailIntegration.ViewModels
 
         private void HomeEmailHandler()
         {
+            Log.Debug("Called HomeEmailHandler");
             if (_isCanceled)
             {
                 ShowEmailPage(false);
