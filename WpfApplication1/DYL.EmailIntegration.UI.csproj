@@ -113,6 +113,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\ApplicationService.cs" />
+    <Compile Include="Helpers\ImageLoader.cs" />
     <Compile Include="Helpers\ShowWindowCommands.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DelegateCommand.cs" />
@@ -199,9 +200,12 @@
     <Content Include="email_adapter_logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="email_adapter_logo.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="images\refresh_pressed.png" />
+    <Resource Include="images\forward_arrow_pressed.png" />
+    <Resource Include="images\backarrow_pressed.png" />
+    <Resource Include="images\refresh_normal.png" />
+    <Resource Include="images\backarrow_normal.png" />
+    <Resource Include="images\forward_arrow_normal.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

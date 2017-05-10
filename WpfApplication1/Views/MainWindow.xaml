@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DYL.EmailIntegration.Views"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:helpers="clr-namespace:DYL.EmailIntegration.UI.Helpers"
         mc:Ignorable="d"
         Height="700" Width="1000"
         WindowStartupLocation="CenterScreen" WindowState="Maximized"  MinHeight="600" MinWidth="800" Style="{DynamicResource MetroWindowStyle}">
@@ -190,24 +191,32 @@
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="50" />
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Visibility="Visible">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="20"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Name="Back" Width="46" Content="&lt;-" FontSize="14" Background="#1666AF" Foreground="White" Command="{Binding BackCommand}" />
-                    <Button Grid.Column="1" Name="Forward" Width="46" Content="-&gt;" FontSize="14" Background="#1666AF" Foreground="White" Command="{Binding ForwardCommand}" />
-                    <Button Grid.Column="3" Name="Refresh" Width="70" Content="Refresh" FontSize="14" Background="#1666AF" Foreground="White" Command="{Binding RefreshCommand}"/>
-                    <TextBox Grid.Column="4"  x:Name="Address" FontWeight="Normal" Foreground="#212121" FontSize="12" VerticalContentAlignment="Center" 
-                           Height="22"  HorizontalAlignment="Stretch" Text="{Binding Address, Mode=TwoWay}">
+                    <Button Grid.Column="0" Height="25" Name="Back" Command="{Binding BackCommand}"
+                            helpers:ImageLoader.DefaultImage="/images/backarrow_normal.png"
+                            helpers:ImageLoader.HoverImage="/images/backarrow_pressed.png"
+                            Style="{DynamicResource ImageButton}"/>
+                    <Button Grid.Column="1" Height="25" Command="{Binding ForwardCommand}"
+                            helpers:ImageLoader.DefaultImage="/images/forward_arrow_normal.png"
+                            helpers:ImageLoader.HoverImage="/images/forward_arrow_pressed.png"
+                            Style="{DynamicResource ImageButton}"/>
+                    <Button Grid.Column="2" Height="25" Command="{Binding RefreshCommand}"
+                            helpers:ImageLoader.DefaultImage="/images/refresh_normal.png"
+                            helpers:ImageLoader.HoverImage="/images/refresh_pressed.png"
+                            Style="{DynamicResource ImageButton}"/>
+                    <TextBox Grid.Column="3"  x:Name="Address" FontWeight="Normal" Foreground="#212121" FontSize="12" VerticalContentAlignment="Center" 
+                           Height="30"  HorizontalAlignment="Stretch" Text="{Binding Address, Mode=TwoWay}" Padding="8,0,0,0">
                         <TextBox.InputBindings>
                             <KeyBinding 
                                 Key="Enter" 
