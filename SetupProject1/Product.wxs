@@ -10,7 +10,7 @@
     <Feature Id="ft_DYL.EmailIntegration" Title="Emails DYL" Level="1">
       <ComponentGroupRef Id="cg_DYL.EmailIntegration" />
     </Feature>
-    <Icon Id="icon.ico" SourceFile="$(var.DYL.EmailIntegration.UI.TargetDir)email_adapter_logo.ico"/>
+    <Icon Id="icon.ico" SourceFile="$(var.DYL.EmailIntegration.UI.TargetDir)images\logo.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 	</Product>
 
@@ -50,7 +50,7 @@
 		      Interactive="no">
 		    </ServiceInstall>
 		    <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="DYLNotificationService" Wait="yes" />
-		    <File Id="email_adapter_logo.png" Name="email_adapter_logo.png" Source="$(var.DYL.EmailIntegration.Service.TargetDir)email_adapter_logo.png" Checksum="yes"/>
+		    <File Id="logo.png" Name="logo.png" Source="$(var.DYL.EmailIntegration.Service.TargetDir)logo.png" Checksum="yes"/>
         <RemoveFolder Id="Remove.INSTALLFOLDERSERVICE" On="uninstall" />
       </Component>
       <Component Id="c_DYL.EmailIntegration.UI"  Guid="31b7668f-d6d2-4595-bcbb-89bc693f7e03" Directory="INSTALLFOLDERUI">
@@ -62,18 +62,19 @@
         <File Id="DYL.EmailIntegration.UI.exe.config" Name="DYL.EmailIntegration.UI.exe.config" Source="$(var.DYL.EmailIntegration.UI.TargetDir)DYL.EmailIntegration.UI.exe.config" Checksum="yes"/>
         <File Id="Interop.SHDocVw.dll" Name="Interop.SHDocVw.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)Interop.SHDocVw.dll" Checksum="yes"/>
         <File Id="Microsoft.mshtml.dll" Name="Microsoft.mshtml.dll" Source="$(var.DYL.EmailIntegration.UI.TargetDir)Microsoft.mshtml.dll" Checksum="yes"/>
-        <File Id="UI.email_adapter_logo.png" Name="email_adapter_logo.png" Source="$(var.DYL.EmailIntegration.UI.TargetDir)email_adapter_logo.png" Checksum="yes"/>
         <!-- This is needed to tell COM what process to start to activate the COM server for this CLSID -->
         <RegistryValue Root="HKCU" Key="Software\Classes\CLSID\{23A5B06E-20BB-4E7E-A0AC-6982ED6A6041}\LocalServer32" Type="string" Value="[#DYL.EmailIntegration.UI.exe]" KeyPath="yes" />
         <RemoveFolder Id="Remove.INSTALLFOLDERUI" On="uninstall" />
       </Component>
       <!-- This creates a start menu shortcut -->
       <Component Id="ApplicationShortcut" Guid="{E49F92FF-D941-4745-ABD8-D2702B9BFD13}" Directory="DYL.Shotcuts">
-        <Shortcut Id="ApplicationStartMenuShortcut" Name="DYL Email Adapter" Description="Sends DYL emails using Outlook Web" Target="[INSTALLFOLDERUI]DYL.EmailIntegration.UI.exe" WorkingDirectory="INSTALLFOLDERUI">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="DYL Email Adapter" Description="Sends DYL emails using Outlook Web" 
+                  Target="[INSTALLFOLDERUI]DYL.EmailIntegration.UI.exe" WorkingDirectory="INSTALLFOLDERUI" Icon="menuLogo.ico">
           <!-- Set the AppID in order to get toast notifications to work -->
           <ShortcutProperty Key="System.AppUserModel.ID" Value="DYL.NotificationService"></ShortcutProperty>
           <!-- Set the ToastActivatorCLSID in order to get notifications working in Action Center -->
           <ShortcutProperty Key="System.AppUserModel.ToastActivatorCLSID" Value="{23A5B06E-20BB-4E7E-A0AC-6982ED6A6041}"></ShortcutProperty>
+          <Icon Id="menuLogo.ico" SourceFile="$(var.DYL.EmailIntegration.UI.TargetDir)images\logo.ico"/>
         </Shortcut>
         <RegistryValue Root="HKCU" Key="Software\Microsoft\DesktopToasts" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
         <RemoveFolder Id="Remove.DYL.Shotcuts" On="uninstall" />

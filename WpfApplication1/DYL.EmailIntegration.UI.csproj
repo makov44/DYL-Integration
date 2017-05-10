@@ -197,7 +197,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="email_adapter_logo.png">
+    <Resource Include="email_adapter_logo.png" />
+    <Content Include="images\logo.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="images\refresh_pressed.png" />
