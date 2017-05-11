@@ -323,7 +323,8 @@ namespace DYL.EmailIntegration.ViewModels
 
             ApplicationService.PostEmailStatus(new Status
             {
-                EmailId = email.Id,
+                Id = email.Id,
+                SequenceId = email.Sequence_Id,
                 StatusName = status
             });
         }
@@ -379,7 +380,8 @@ namespace DYL.EmailIntegration.ViewModels
 
                     ApplicationService.PostEmailStatus(new Status
                     {
-                        EmailId = email.Id,
+                        Id = email.Id,
+                        SequenceId = email.Sequence_Id,
                         StatusName = "deleted"
                     });
                 }

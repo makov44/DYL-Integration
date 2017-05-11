@@ -113,7 +113,8 @@ namespace DYL.EmailIntegration.Helpers
         {
             var statusHttpRequest = new StatusHttpRequest
             {
-                id = status.EmailId,
+                id = status.Id,
+                sequence_id = status.SequenceId,
                 status = status.StatusName,
                 session_key = Context.Session.Key
             };

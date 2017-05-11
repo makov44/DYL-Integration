@@ -3,9 +3,8 @@
     public class StatusHttpRequest
     {
         public string session_key { get; set; }
-
         public string id { get; set; }
-
         public string status { get; set; }
+        public string sequence_id { get; set; }
     }
 }

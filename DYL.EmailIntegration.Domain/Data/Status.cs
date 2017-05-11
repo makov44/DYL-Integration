@@ -8,8 +8,10 @@ namespace DYL.EmailIntegration.Domain.Data
 {
     public class Status
     {
-        public string EmailId { get; set; }
+        public string Id { get; set; }
 
         public string StatusName { get; set; }
+
+        public string SequenceId { get; set; }
     }
 }
