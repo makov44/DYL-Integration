@@ -8,6 +8,7 @@ using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Contracts;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Models;
+using DYL.EmailIntegration.UI.Helpers;
 using DYL.EmailIntegration.UI.Properties;
 using log4net;
 
@@ -35,7 +36,11 @@ namespace DYL.EmailIntegration.Helpers
                     var response = await HttpService.GetEmails(Constants.GetEmailsUrl, session);
                     if (response == null || response.Count == 0 || response.Data == null)
                         return;
-                    response.Data.ForEach(x => Context.EmailQueue.Enqueue(x));
+                    response.Data.ForEach(x =>
+                    {
+                        if(!Context.EmailQueue.ContainsId(x))
+                            Context.EmailQueue.Enqueue(x);
+                    });
                 }
                 catch (Exception ex)
                 {

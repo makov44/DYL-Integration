@@ -10,6 +10,6 @@ namespace DYL.EmailIntegration.Domain.Data
       
         public string Subject { get; set; }
       
-        public string Body { get; set; }       
+        public string Body { get; set; }
     }
 }

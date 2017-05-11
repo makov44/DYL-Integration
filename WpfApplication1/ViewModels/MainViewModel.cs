@@ -16,6 +16,7 @@ using DYL.EmailIntegration.Domain;
 using DYL.EmailIntegration.Domain.Data;
 using DYL.EmailIntegration.Helpers;
 using DYL.EmailIntegration.Models;
+using DYL.EmailIntegration.UI.Helpers;
 using DYL.EmailIntegration.UI.Properties;
 using log4net;
 using mshtml;
@@ -338,7 +339,8 @@ namespace DYL.EmailIntegration.ViewModels
             if (email == null)
                 return;
 
-            Context.EmailQueue.Enqueue(email);
+            if (!Context.EmailQueue.ContainsId(email))
+                Context.EmailQueue.Enqueue(email);
         }
 
         private void Delete_OnClick()
