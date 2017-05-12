@@ -120,6 +120,20 @@ namespace DYL.EmailIntegration.ViewModels
             }
         }
 
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get { return  _errorMessage;}
+            set
+            {
+                if (_errorMessage == value)
+                    return;
+
+                _errorMessage = value;
+                RaisePropertyChangedEvent("ErrorMessage");
+            }
+        }
+
         private Visibility _emailsListLayout;
         public Visibility EmailsListLayout
         {
@@ -192,12 +206,25 @@ namespace DYL.EmailIntegration.ViewModels
             _browser.Navigate(_startPage);
             Context.EmailQueue.CollectionChanged += EmailQueue_CollectionChanged;
             Context.PropertyChanged += Context_PropertyChanged;
+            this.PropertyChanged += MainViewModel_PropertyChanged;
             _currentPage = PageName.None;
             SentEmails = 0;
             LogInLayoutVisibility = Visibility.Visible;
             MainLayoutVisibility = Visibility.Collapsed;
             IsLoginInvalid = Visibility.Collapsed;
             ShowEmailPage(false);
+        }
+
+        private void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ErrorMessage) && !string.IsNullOrEmpty(ErrorMessage))
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    await Task.Delay(5000).ConfigureAwait(false);
+                    ErrorMessage = "";
+                });
+            }
         }
 
         private void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -285,6 +312,7 @@ namespace DYL.EmailIntegration.ViewModels
                 var sendButton = _document.GetElementById("send");
                 if (sendButton == null)
                 {
+                    ErrorMessage = "Failed to send email. Navigate to Web Outlook home page and try again.";
                     Log.Error("Can't find element by id 'send' on the page.");
                     return;
                 }
@@ -305,8 +333,7 @@ namespace DYL.EmailIntegration.ViewModels
         {
             if (Context.EmailQueue.Count > Settings.Default.MaxSizeEmailsQueue)
             {
-               MessageBox.Show($"Email Queue exceeded the limit of {Settings.Default.MaxSizeEmailsQueue} items.",
-                   "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ErrorMessage = $"Email Queue exceeded the limit of {Settings.Default.MaxSizeEmailsQueue} items. Please send emails from a queue.";
                 return;
             }
 
@@ -361,7 +388,11 @@ namespace DYL.EmailIntegration.ViewModels
         private void DeleteAll_OnClick()
         {
             if (Context.EmailQueue.IsEmpty)
+            {
+                ErrorMessage = "There are no messages in the queue.";
                 return;
+            }
+                
 
             var result = MessageBox.Show("Are you sure you want to delete all emails?", "Warning", MessageBoxButton.OKCancel,
                 MessageBoxImage.Warning);
@@ -420,8 +451,7 @@ namespace DYL.EmailIntegration.ViewModels
         {
             if (Context.EmailQueue.Count <= 0)
             {
-                MessageBox.Show("There are no emails to send.", "Warning", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                ErrorMessage = "There are no emails to send.";
                 return;
             }
 
@@ -433,6 +463,7 @@ namespace DYL.EmailIntegration.ViewModels
             }
             else
             {
+                ErrorMessage ="Please open Web Outlook home page to start sending email.";
                 Log.Error("Can't find element 'newmsgc' on the page.");
             }
         }

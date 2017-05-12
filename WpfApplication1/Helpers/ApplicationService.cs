@@ -19,12 +19,6 @@ namespace DYL.EmailIntegration.Helpers
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static void GetEmails(string key)
         {
-            if (Context.EmailQueue.Count > Settings.Default.MaxSizeEmailsQueue)
-            {
-                Log.Error($"Email Queue has reached the limit of {Settings.Default.MaxSizeEmailsQueue} items.");
-                return;
-            }
-               
             System.Windows.Application.Current.Dispatcher.Invoke(async () =>
             {
                 try
@@ -36,6 +30,7 @@ namespace DYL.EmailIntegration.Helpers
                     var response = await HttpService.GetEmails(Constants.GetEmailsUrl, session);
                     if (response == null || response.Count == 0 || response.Data == null)
                         return;
+
                     response.Data.ForEach(x =>
                     {
                         if(!Context.EmailQueue.ContainsId(x))
