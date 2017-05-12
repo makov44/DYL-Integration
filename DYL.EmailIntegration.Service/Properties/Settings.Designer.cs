@@ -34,7 +34,7 @@ namespace DYL.EmailIntegration.Service.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int NotificationInterval {
             get {
                 return ((int)(this["NotificationInterval"]));
@@ -52,7 +52,7 @@ namespace DYL.EmailIntegration.Service.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3600000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int SessionExpirationInterval {
             get {
                 return ((int)(this["SessionExpirationInterval"]));

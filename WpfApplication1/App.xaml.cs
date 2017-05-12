@@ -58,8 +58,8 @@ namespace DYL.EmailIntegration
             log4net.Config.XmlConfigurator.Configure();
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += ExceptionEventHandler;
-            _emailsTimer = new LocalTimer(Settings.Default.ServiceInterval, "Email");
-            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
+            _emailsTimer = new LocalTimer(Settings.Default.ServiceInterval * 60000, "Email");
+            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval * 60000, "Session");
         }
 
       

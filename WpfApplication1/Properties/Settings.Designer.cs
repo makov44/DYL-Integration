@@ -25,7 +25,7 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int ServiceInterval {
             get {
                 return ((int)(this["ServiceInterval"]));
@@ -70,7 +70,7 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3600000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int SessionExpirationInterval {
             get {
                 return ((int)(this["SessionExpirationInterval"]));
@@ -79,7 +79,7 @@ namespace DYL.EmailIntegration.UI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public int MaxSizeEmailsQueue {
             get {
                 return ((int)(this["MaxSizeEmailsQueue"]));

@@ -47,8 +47,8 @@ namespace DYL.EmailIntegration.Service
             }
 
             _serviceHost = ApplicationService.CreateNetPipeHost();
-            _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval, "Notification");
-            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval, "Session");
+            _emailsTimer = new LocalTimer(Settings.Default.NotificationInterval * 60000, "Notification");
+            _sessionTimer = new LocalTimer(Settings.Default.SessionExpirationInterval * 60000, "Session");
             HttpService.CreateService(Settings.Default.BaseUrl);
             Context.ResetTimer += Context_ResetTimer;
 
